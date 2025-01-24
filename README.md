@@ -76,17 +76,17 @@ Ambos proporcionan una descripción completa de los endpoints disponibles, méto
      pip install -r requirements.txt
    ```
 4. Realizar las migraciones:
-  ```bash
-  python manage.py makemigrations
-  python manage.py migrate
-  ```
+     ```bash
+     python manage.py makemigrations
+     python manage.py migrate
+     ```
 5. Ejecutar el servidor de desarrollo:
-  ```bash
-  python manage.py runserver
-  ```
+     ```bash
+     python manage.py runserver
+     ```
 ## **Creado Por...**
 Natali Ulla Guillermo Enrique. 
-- [Github](https://github.com/guille-nat), 
+- [Github](https://github.com/guille-nat)
 - [Portfolio](https://nataliullacoder.com/)
 - Correo: guillermonatali22@gmail.com
 
