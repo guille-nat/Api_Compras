@@ -44,7 +44,7 @@ API diseñada para la gestión de compras, pagos, cuotas, inventario y usuarios.
    - Si una cuota es pagada antes de su fecha de vencimiento, se aplica un descuento adicional del **15%** al monto de la cuota.
 
 2. **Recargo por Pago Tardío**:
-   - Si una cuota no se paga dentro del plazo de 30 días desde su emisión, se aplica un recargo del **20%** sobre el monto de la cuota.
+   - Si una cuota no se paga dentro del plazo de 30 días desde su emisión, se aplica un recargo del **8%** sobre el monto de la cuota.
 
 3. **Cálculo de Montos en Cuotas**:
    - En compras con más de 6 cuotas, se aplica un incremento del **15%** en el monto de cada cuota.
