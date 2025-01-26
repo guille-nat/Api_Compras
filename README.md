@@ -13,7 +13,7 @@ API diseñada para la gestión de compras, pagos, cuotas, inventario y usuarios.
 ## **🔒Autenticación con JWT**
 Este proyecto utiliza JSON Web Tokens (JWT) para la autenticación y autorización de usuarios.
 
-##Endpoints Principales:
+## Endpoints Principales:
    - Obtener Token de Acceso y Refresh:
          POST /api/token/
 Enviar credenciales del usuario (username y password) para obtener los tokens.
