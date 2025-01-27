@@ -8,7 +8,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Sistema de Compras API",
         default_version='v1',
-        description="Test description",
+        description="API diseñada para la gestión de compras, pagos, cuotas, inventario y usuarios.\n Este proyecto incluye validaciones robustas y reglas de negocio para asegurar un manejo eficiente y seguro de las operaciones.",
         terms_of_service="https://www.nataliullacoder.com",
         contact=openapi.Contact(email="guillermonatali22@gmail.com"),
         license=openapi.License(name="BSD License nataliullacoder.com"),
