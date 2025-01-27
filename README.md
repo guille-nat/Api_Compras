@@ -65,7 +65,7 @@ Probar en Thunder Client o Postman:
 
 ### **💰Pagos y Cuotas**
 1. **Descuento por Pronto Pago**:
-   - Si una cuota es pagada antes de su fecha de vencimiento, se aplica un descuento adicional del **15%** al monto de la cuota.
+   - Si una cuota es pagada antes de su fecha de vencimiento, se aplica un descuento adicional del **5%** al monto de la cuota.
 
 2. **Recargo por Pago Tardío**:
    - Si una cuota no se paga dentro del plazo de 30 días desde su emisión, se aplica un recargo del **8%** sobre el monto de la cuota.
