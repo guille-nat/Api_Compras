@@ -11,28 +11,22 @@ API diseñada para la gestión de compras, pagos, cuotas, inventario y usuarios.
 ---
 
 ## **🔒Autenticación con JWT**
-Este proyecto utiliza JSON Web Tokens (JWT) para la autenticación y autorización de usuarios.
+El proyecto utiliza JWT (JSON Web Tokens) para la autenticación. Esto asegura que solo usuarios autenticados puedan acceder a las rutas protegidas de la API.
 
-## Endpoints Principales:
-   - Obtener Token de Acceso y Refresh:
-         POST /api/token/
-Enviar credenciales del usuario (username y password) para obtener los tokens.
-   - Refrescar Token de Acceso:
-         POST /api/token/refresh/
-Enviar el token de refresh para obtener un nuevo token de acceso.
-
-### Uso del Token:
-1. Añadir el token de acceso en el encabezado de las solicitudes protegidas:
-
-```bash
-   Authorization: Bearer <access_token>
+### **Obtener un Token de Acceso**
+Para obtener un token de acceso, realiza una petición `POST` al endpoint `/api/token/` con las credenciales del usuario:
+```json
+{
+  "username": "tu_usuario",
+  "password": "tu_contraseña"
+}
 ```
-2. Accede a rutas protegidas como usuario autenticado.
 
-Probar en Thunder Client o Postman:
-- Solicita un token en /api/token/.
-- Usa el encabezado Authorization con el token para probar las rutas protegidas.
----
+### **Uso del Token**
+Incluye el token en el encabezado de las peticiones protegidas:
+```
+Authorization: Bearer <tu_token>
+```
 
 ## **💼Reglas de Negocio**
 
@@ -77,8 +71,8 @@ Probar en Thunder Client o Postman:
 
 ## **📄Documentación de los Endpoints**
 La documentación de los endpoints está disponible en los siguientes enlaces:
-- **Swagger UI**: [localhost:8000/doc](http://localhost:8000/doc)
-- **ReDoc**: [localhost:8000/redoc](http://localhost:8000/redoc)
+- **Swagger:** [http://localhost:8000/doc](http://localhost:8000/doc)
+- **Redoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 Ambos proporcionan una descripción completa de los endpoints disponibles, métodos permitidos, parámetros requeridos y ejemplos de respuestas.
 
@@ -128,6 +122,14 @@ Para probar el envío de correos electrónicos, ejecuta el siguiente comando en 
 Si la configuración es correcta, deberías recibir un correo con el contenido en formato HTML.
 
 ---
+
+#### **Automatización**
+Este comando se puede automatizar utilizando un cron job (Linux) o el programador de tareas de Windows para ejecutarlo a intervalos regulares, garantizando que las cuotas y notificaciones se actualicen automáticamente sin intervención manual.
+
+Ejemplo de configuración en crontab (Linux):
+```bash
+0 0 * * * /ruta/a/tu/python /ruta/a/tu/proyecto/manage.py actualizar_cuotas
+```
 
 ## **Instalación y Configuración**
 1. Clonar este repositorio:
