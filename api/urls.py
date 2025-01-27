@@ -5,7 +5,7 @@ from rest_framework_simplejwt.views import (
 )
 from .views import (
     UserViewSet,
-    ProductsViewSet, CompraViewSet,
+    ProductsViewSet, CompraViewSet, PagosCuotasViewSet
 
 )
 from rest_framework import routers
@@ -15,6 +15,7 @@ router = routers.DefaultRouter()
 router.register(r'user', UserViewSet, basename='users')
 router.register(r'products', ProductsViewSet, basename='products')
 router.register(r'compras', CompraViewSet, basename='compras')
+router.register(r'pago', PagosCuotasViewSet, basename='pagos')
 
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

@@ -8,6 +8,7 @@ from .models import (
 from django.db import transaction
 from rest_framework.exceptions import ValidationError
 from datetime import timedelta, date
+from decimal import Decimal
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -61,9 +62,9 @@ class ComprasSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'usuario', 'fecha_compra',
             'cuotas_totales', 'descuento_aplicado',
-            'detalles'
+            'detalles', 'monto_total', 'monto_pagado'
         ]
-        read_only_field = ['id', 'monto_total']
+        read_only_field = ['id', 'monto_total', 'monto_pagado']
 
     def validate(self, attrs):
         # Validar que las cuotas sean mayores a 0
@@ -106,8 +107,10 @@ class ComprasSerializer(serializers.ModelSerializer):
             raise ValidationError(errors)
 
         # Aplicar aumento en cuotas mayores a 6
-        if cuotas_totales > 6:
-            monto_total += monto_total * 0.15  # 15% de aumento
+        if cuotas_totales >= 12:
+            monto_total += monto_total * Decimal('0.45')  # 45% de aumento
+        elif cuotas_totales >= 6:
+            monto_total += monto_total * Decimal('0.15')  # 15% de aumento
 
         fecha_vencimiento = fecha_compra + \
             timedelta(days=cuotas_totales * 30)
@@ -140,31 +143,27 @@ class ComprasSerializer(serializers.ModelSerializer):
             fecha_vencimiento_cuota = fecha_compra + \
                 timedelta(days=(i + 1) * 30)
             Cuotas.objects.create(
-                compra=compra,
-                numero_cuota=i + 1,
+                compras=compra,
+                nro_cuota=i + 1,
                 monto=monto_por_cuota,
-                fecha_vencimiento=fecha_vencimiento_cuota
+                fecha_vencimiento=fecha_vencimiento_cuota,
+                estado='PENDIENTE'
             )
 
         return compra
 
 
-class CuotasSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cuotas
-        fields = [
-            'id', 'compra', 'nro_cuota', 'monto',
-            'fecha_vencimiento', 'estado'
-        ]
-        read_only_fields = ['id',]
-
-
 class PagosSerializer(serializers.ModelSerializer):
+    cuotas = serializers.PrimaryKeyRelatedField(
+        queryset=Cuotas.objects.all(),  # Asegura que el ID de la cuota exista
+        help_text="ID de la cuota a la que se aplica el pago."
+    )
+
     class Meta:
         model = Pagos
         fields = [
-            'id', 'cuotas', 'fecha_pago', 'monto',
-            'medio_pago', 'descuento_aplicado'
+            'id', 'cuotas',
+            'medio_pago'
         ]
         read_only_fields = ['id',]
 

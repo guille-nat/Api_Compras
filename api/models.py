@@ -69,6 +69,8 @@ class Compras(models.Model):
     )
     cuota_actual = models.PositiveIntegerField(
         help_text="Total de cuotas a pagar.", default=1)
+    monto_pagado = models.DecimalField(
+        max_digits=10, decimal_places=2, help_text="Monto que se ha pagado.", default=0.00)
 
     def __str__(self):
         """
@@ -93,25 +95,28 @@ class Cuotas(models.Model):
         estado (CharField): Estado de la cuota: PENDIENTE, PAGADA, o ATRASADA.
     """
     ESTADOS = [
-        ('PENDIENTE', 'Pendiente'),
-        ('PAGADA', 'Pagada'),
-        ('ATRASADA', 'Atrasada'),
+        ('PENDIENTE', 'PENDIENTE'),
+        ('PAGADA', 'PAGADA'),
+        ('ATRASADA', 'ATRASADA'),
     ]
     compras = models.ForeignKey(
-        Compras, on_delete=models.CASCADE, help_text="Compra asociada a la cuota.", related_name='cuotas')
+        Compras, on_delete=models.CASCADE, help_text="Compra asociada a la cuota.", related_name='cuotas'
+    )
     nro_cuota = models.PositiveIntegerField(help_text="Número de cuota.")
     monto = models.DecimalField(
-        max_digits=10, decimal_places=2, help_text="Monto de la cuota a abonar.")
+        max_digits=10, decimal_places=2, help_text="Monto de la cuota a abonar."
+    )
     fecha_vencimiento = models.DateField(
         help_text="Fecha en la cual vence la cuota.")
     estado = models.CharField(
-        max_length=9, choices=ESTADOS, default='PENDIENTE', help_text="Estad de la cuota.")
+        max_length=9, choices=ESTADOS, default='PENDIENTE', help_text="Estado de la cuota."
+    )
 
     def __str__(self):
         """
         Representación legible del objeto Cuotas.
         """
-        return f"Cuota {self.nro_cuota} - Compra {self.compra.id}"
+        return f"Cuota {self.nro_cuota} - Compra {self.compras.id}"
 
     class Meta:
         verbose_name = "Cuota"
@@ -129,9 +134,9 @@ class Pagos(models.Model):
         medio_pago (CharField): Método utilizado para realizar el pago (Efectivo, Tarjeta, Transferencia).
     """
     MEDIOS_PAGO = [
-        ('EFECTIVO', 'Efectivo'),
-        ('TARJETA', 'Tarjeta'),
-        ('TRANSFERENCIA', 'Transferencia'),
+        ('EFECTIVO', 'EFECTIVO'),
+        ('TARJETA', 'TARJETA'),
+        ('TRANSFERENCIA', 'TRANSFERENCIA'),
     ]
 
     cuotas = models.ForeignKey(
