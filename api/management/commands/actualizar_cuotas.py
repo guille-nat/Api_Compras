@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from datetime import date, timedelta
-from api.models import Cuotas, Notificacion
+from api.pagos.models import Cuotas
+from api.models import Notificacion
 from api.utils import enviar_correo
 from decimal import Decimal
 import logging
@@ -31,7 +32,7 @@ class Command(BaseCommand):
                 cuota.save()
                 detalles = cuota.compras.detalles.all()
                 productos = '\n'.join(
-                    [str(detalle.products)
+                    [str(detalle.productos)
                      for detalle in detalles]
                 )
                 # Obtener el usuario asociado
@@ -72,6 +73,9 @@ class Command(BaseCommand):
                                             font-size: 12px;
                                             color: #777;
                                         }}
+                                        .footer a{{
+                                            color:#fff;
+                                        }}
                                         a{{
                                             display: inline-block;
                                             background-color: #4CAF50;
@@ -91,6 +95,7 @@ class Command(BaseCommand):
                                     
                                     <div class="content">
                                         <p>Estimado/a {usuario.username}</p>
+                                            <p>Con nombre: {usuario.first_name}, {usuario.last_name}</p>
                                             <p>Le informamos que su cuota con vencimiento el <strong>{cuota.fecha_vencimiento}</strong> se encuentra <b>pendiente de pago.</b></p>
                                             
                                             <p>Detalles de la cuota:</p>

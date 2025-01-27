@@ -1,7 +1,10 @@
-__pycache__
-.venv
 plantilla.html
 plantilla2.html
 .env
 MER.mwb
 MER.mwb.bak
+*.env
+__pycache__/
+*.pyc
+build/
+.vscode/

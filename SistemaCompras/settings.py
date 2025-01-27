@@ -26,7 +26,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
-    'api',
+    'api',  # app principal (incluye notificaciones)
+    'api.productos',  # app para productos
+    'api.compras',  # app para compras
+    'api.pagos',  # app para pagos
+    'api.usuarios',  # app para usuarios
 ]
 
 MIDDLEWARE = [

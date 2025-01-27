@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Cuotas, Notificacion
+from api.pagos.models import Cuotas
+from .models import Notificacion
 from datetime import date
 from .utils import enviar_correo
 
@@ -15,7 +16,7 @@ def crear_notificacion_cuota(sender, instance, created, **kwargs):
         if instance.estado == 'PAGADA':
             detalles = instance.compras.detalles.all()
             productos = '\n'.join(
-                [str(detalle.products)
+                [str(detalle.productos)
                  for detalle in detalles]
             )
             mensaje_html = f"""
@@ -53,6 +54,9 @@ def crear_notificacion_cuota(sender, instance, created, **kwargs):
                         font-size: 12px;
                         color: #777;
                     }}
+                    .footer a{{
+                        color: #fff;
+                    }}
                     a {{
                         display: inline-block;
                         background-color: #4CAF50;
@@ -76,6 +80,8 @@ def crear_notificacion_cuota(sender, instance, created, **kwargs):
 
                 <div class="content">
                     <p>Estimado/a {instance.compras.usuario.username}</p>
+                    <p>Con nombre: {instance.compras.usuario.first_name}, {instance.compras.usuario.last_name}</p>
+                    
 
                     <p>Nos complace confirmarle que hemos recibido su pago correctamente. Agradecemos su puntualidad y confianza en
                         nuestros servicios.</p>
