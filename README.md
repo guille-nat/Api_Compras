@@ -33,7 +33,6 @@ API diseñada para la gestión de compras, pagos, cuotas, inventario y usuarios.
 4. En api.utils.py se cambio el nombre de la función y los parámetros de "enviar_correo(email_destino, asunto, mensaje_html)" pasar a ser "sendEmail(destination_email, subject, message_html)".
 
 ---
----
 
 ## ⏳ **Resumen de Mejoras Futuras**
 
