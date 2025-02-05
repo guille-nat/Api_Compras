@@ -1,25 +1,25 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from api.pagos.models import Cuotas
-from .models import Notificacion
+from api.payments.models import Installment
+from .models import Notification
 from datetime import date
-from .utils import enviar_correo
+from .utils import sendEmail
 
 
-@receiver(post_save, sender=Cuotas)
-def crear_notificacion_cuota(sender, instance, created, **kwargs):
+@receiver(post_save, sender=Installment)
+def create_notification_installment(sender, instance, created, **kwargs):
     """
     Crea una notificación cuando una cuota cambia de estado Pagado y envía la notificación.
     """
 
     if not created:  # Si la cuota ya existía y se actualizó
-        if instance.estado == 'PAGADA':
-            detalles = instance.compras.detalles.all()
-            productos = '\n'.join(
-                [str(detalle.productos)
-                 for detalle in detalles]
+        if instance.state == 'PAGADA':
+            details = instance.purchase.details.all()
+            product = '\n'.join(
+                [str(detail.product)
+                 for detail in details]
             )
-            mensaje_html = f"""
+            message_html = f"""
             <!DOCTYPE html>
             <html lang="es">
             <head>
@@ -79,8 +79,8 @@ def crear_notificacion_cuota(sender, instance, created, **kwargs):
                 </div>
 
                 <div class="content">
-                    <p>Estimado/a {instance.compras.usuario.username}</p>
-                    <p>Con nombre: {instance.compras.usuario.first_name}, {instance.compras.usuario.last_name}</p>
+                    <p>Estimado/a {instance.purchase.user.username}</p>
+                    <p>Con nombre: {instance.purchase.user.first_name}, {instance.purchase.user.last_name}</p>
                     
 
                     <p>Nos complace confirmarle que hemos recibido su pago correctamente. Agradecemos su puntualidad y confianza en
@@ -89,11 +89,11 @@ def crear_notificacion_cuota(sender, instance, created, **kwargs):
                     <div class="payment-details">
                         <p><strong>Detalles del pago:</strong></p>
                         <ul>
-                            <li><strong>Productos: </strong><pre>{productos}</pre></li>
-                            <li>Número de cuota: <strong>{instance.nro_cuota}</strong></li>
-                            <li>Monto pagado: <strong>${instance.monto:,.2f}</strong></li>
+                            <li><strong>Productos: </strong><pre>{product}</pre></li>
+                            <li>Número de cuota: <strong>{instance.num_installment}</strong></li>
+                            <li>Monto pagado: <strong>${instance.amount:,.2f}</strong></li>
                             <li>Fecha de pago: <strong>{date.today()}</strong></li>
-                            <li>Con fecha de vencimiento: <strong>{instance.fecha_vencimiento}</strong></li>
+                            <li>Con fecha de vencimiento: <strong>{instance.due_date_installment}</strong></li>
                         </ul>
                     </div>
 
@@ -110,18 +110,18 @@ def crear_notificacion_cuota(sender, instance, created, **kwargs):
                 </div>
             </body>
             </html>"""
-            mensaje = f"""Estimado/a {instance.compras.usuario.username},Número de cuota: {instance.nro_cuota},
-            Monto pagado: ${instance.monto:,.2f}, Fecha de pago: {date.today()},Con fecha de vencimiento: {instance.fecha_vencimiento},
+            message = f"""Estimado/a {instance.purchase.user.username},Número de cuota: {instance.num_installment},
+            Monto pagado: ${instance.amount:,.2f}, Fecha de pago: {date.today()},Con fecha de vencimiento: {instance.due_date_installment},
             Este pago ha sido aplicado a su cuenta y su saldo ha sido actualizado."""
 
-            Notificacion.objects.create(
-                usuario=instance.compras.usuario,
-                compra=instance.compras,
-                cuota=instance,
-                mensaje=mensaje
+            Notification.objects.create(
+                user=instance.purchase.user,
+                purchase=instance.purchase,
+                installment=instance,
+                message=message
             )
-            enviar_correo(
-                email_destino=str(instance.compras.usuario.email),
-                asunto='Notificación su cuota esta Pagada',
-                mensaje_html=mensaje_html
+            sendEmail(
+                destination_email=str(instance.purchase.user.email),
+                subject='Notificación su cuota esta Pagada',
+                message_html=message_html
             )

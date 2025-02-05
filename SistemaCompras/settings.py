@@ -10,9 +10,9 @@ load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = True
+DEBUG = True  # Cambiar en producción a False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*"]  # Cambiar en producción
 
 
 INSTALLED_APPS = [
@@ -26,12 +26,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'drf_yasg',
+    'drf_spectacular',
     'api',  # app principal (incluye notificaciones)
-    'api.productos',  # app para productos
-    'api.compras',  # app para compras
-    'api.pagos',  # app para pagos
-    'api.usuarios',  # app para usuarios
+    'api.products',  # app para productos
+    'api.purchases',  # app para compras
+    'api.payments',  # app para pagos
+    'api.users',  # app para usuarios
 ]
+# Apunta a la app 'users' y al modelo 'CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -70,11 +73,21 @@ DATABASES = {
         "NAME": os.getenv("NAME"),
         "USER": os.getenv("USER"),
         "PASSWORD": os.getenv("PASSWORD"),
-        'HOST': 'localhost',
+        'HOST': 'localhost',  # Cambiar al nombre de host de la DB en producción
         'PORT': '3306',
 
     }
 }
+
+# Agrupar migraciones en una sola carpeta
+MIGRATION_MODULES = {
+    'api': 'migrations.api',
+    'products': 'migrations.products',
+    'purchases': 'migrations.purchases',
+    'payments': 'migrations.payments',
+    'users': 'migrations.users',
+}
+
 CORS_ALLOWED_ORIGINS = []
 CORS_ALLOW_METHODS = (
     "DELETE",
@@ -108,14 +121,18 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+
 }
+
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),

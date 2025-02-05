@@ -1,13 +1,13 @@
 from django.shortcuts import render
-from .serializers import NotificacionSerializer
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from .serializers import NotificationSerializer
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
-from .models import Notificacion
+from .models import Notification
 
 
 class NotificationListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = NotificacionSerializer
+    serializer_class = NotificationSerializer
 
     def get_queryset(self):
-        return Notificacion.objects.filter(usuario=self.request.user)
+        return Notification.objects.filter(user=self.request.user)

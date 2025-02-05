@@ -1,13 +1,13 @@
 from rest_framework.permissions import AllowAny
 from api.permissions import IsAdminUser
-from .models import Productos
-from .serializers import ProductsSerializer
+from .models import Product
+from .serializers import ProductSerializer
 from rest_framework import viewsets
 
 
-class ProductosViewSet(viewsets.ModelViewSet):
-    queryset = Productos.objects.all()
-    serializer_class = ProductsSerializer
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
     def get_permissions(self):
         # Permitir acceso sin autenticación para las acciones 'list' y 'retrieve'

@@ -1,32 +1,32 @@
 from django.db import models
-from django.contrib.auth.models import User
-from api.compras.models import Compras
-from api.pagos.models import Cuotas
+from api.users.models import CustomUser
+from api.purchases.models import Purchase
+from api.payments.models import Installment
 
 
-class Notificacion(models.Model):
+class Notification(models.Model):
     """
     Modelo para gestionar notificaciones relacionadas con usuarios y compras.
 
     Atributos:
-        usuario (ForeignKey): Usuario asociado a la notificación.
-        compra (ForeignKey): Compra asociada a la notificación (opcional).
-        cuota (ForeignKey): Cuota asociada a la notificación (opcional).
-        mensaje (TextField): Mensaje de la notificación.
-        fecha_creacion (DateTimeField): Fecha de creación de la notificación.
-        enviada (BooleanField): Si la notificación ya fue enviada.
+        user (ForeignKey): Usuario asociado a la notificación.
+        purchase (ForeignKey): Compra asociada a la notificación (opcional).
+        installment (ForeignKey): Cuota asociada a la notificación (opcional).
+        message (TextField): Mensaje de la notificación.
+        created_at (DateTimeField): Fecha de creación de la notificación.
+        sended (BooleanField): Si la notificación ya fue enviada.
     """
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    compra = models.ForeignKey(
-        Compras, on_delete=models.CASCADE, null=True, blank=True)
-    cuota = models.ForeignKey(
-        Cuotas, on_delete=models.CASCADE, null=True, blank=True)
-    mensaje = models.TextField()
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    enviada = models.BooleanField(default=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    purchase = models.ForeignKey(
+        Purchase, on_delete=models.CASCADE, null=True, blank=True)  # Purchase
+    installment = models.ForeignKey(
+        Installment, on_delete=models.CASCADE, null=True, blank=True)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    sended = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Notificación para {self.usuario.username} - {self.mensaje[:30]}..."
+        return f"Notificación para {self.user.username} - {self.message[:30]}..."
 
     class Meta:
         verbose_name = 'Notificación'

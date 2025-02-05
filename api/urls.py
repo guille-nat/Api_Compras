@@ -3,21 +3,21 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from api.usuarios.view import UserViewSet
-from api.pagos.views import PagosCuotasViewSet
-from api.productos.views import ProductosViewSet
-from api.compras.views import CompraViewSet
+from api.users.view import UserViewSet
+from api.payments.views import PaymentInstallmentViewSet
+from api.products.views import ProductViewSet
+from api.purchases.views import PurchaseViewSet
 from rest_framework import routers
 
 
-router = routers.DefaultRouter()
-router.register(r'user', UserViewSet, basename='usuarios')
-router.register(r'productos', ProductosViewSet, basename='productos')
-router.register(r'compra', CompraViewSet, basename='compras')
-router.register(r'pago', PagosCuotasViewSet, basename='pagos')
+router = routers.DefaultRouter(trailing_slash=False)  # Elimina la barra final
+router.register(r'users', UserViewSet, basename='users')
+router.register(r'products', ProductViewSet, basename='productos')
+router.register(r'purchases', PurchaseViewSet, basename='purchases')
+router.register(r'payments', PaymentInstallmentViewSet, basename='payments')
 
 urlpatterns = [
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('', include(router.urls))
 ]

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from api.utils import enviar_correo
+from api.utils import sendEmail
 
 
 class Command(BaseCommand):
@@ -8,7 +8,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         try:
             # Crear el mensaje de notificación
-            mensaje_html = f"""<!DOCTYPE html>
+            message_html = f"""<!DOCTYPE html>
                                         <html lang="es">
                                         <head>
                                             <meta charset="UTF-8">
@@ -83,10 +83,10 @@ class Command(BaseCommand):
                                         </html>  
                         """
             # Enviar correo al usuario
-            enviar_correo(
-                email_destino="Tu_Email",
-                asunto='Notificación: Su cuota está vencida',
-                mensaje_html=mensaje_html
+            sendEmail(
+                destination_email="Tu_Email",
+                subject='Notificación: Su cuota está vencida',
+                message_html=message_html
             )
             self.stdout.write(self.style.SUCCESS('Correo enviado con éxito.'))
         except Exception as e:

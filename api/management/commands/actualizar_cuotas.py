@@ -1,8 +1,8 @@
 from django.core.management.base import BaseCommand
 from datetime import date, timedelta
-from api.pagos.models import Cuotas
-from api.models import Notificacion
-from api.utils import enviar_correo
+from api.payments.models import Installment
+from api.models import Notification
+from api.utils import sendEmail
 from decimal import Decimal
 import logging
 
@@ -14,32 +14,32 @@ class Command(BaseCommand):
         try:
             logger = logging.getLogger(__name__)
             # Obtener todas las cuotas pendientes con fecha de vencimiento menor o igual a hoy
-            cuotas_vencidas = Cuotas.objects.filter(
-                fecha_vencimiento__lte=date.today(),
-                estado='PENDIENTE'  # Solo cuotas pendientes
+            due_installment = Installment.objects.filter(
+                due_date_installment__lte=date.today(),
+                state='PENDIENTE'  # Solo cuotas pendientes
             )
 
             logger.info(
-                f"Cuotas vencidas encontradas: {cuotas_vencidas.count()}")
+                f"Cuotas vencidas encontradas: {due_installment.count()}")
 
-            for cuota in cuotas_vencidas:
+            for installment in due_installment:
                 # Actualizar el estado de la cuota a ATRASADA
-                cuota.estado = 'ATRASADA'
+                installment.state = 'ATRASADA'
                 recargo = Decimal('0.08')  # Recargo del 8%
-                total_recargado = cuota.monto * recargo
-                cuota.monto += round(total_recargado, 2)
-                cuota.fecha_vencimiento += timedelta(days=15)
-                cuota.save()
-                detalles = cuota.compras.detalles.all()
-                productos = '\n'.join(
-                    [str(detalle.productos)
-                     for detalle in detalles]
+                total_recargado = installment.amount * recargo
+                installment.amount += round(total_recargado, 2)
+                installment.due_date_installment += timedelta(days=15)
+                installment.save()
+                details = installment.purchase.details.all()
+                product = '\n'.join(
+                    [str(detail.product)
+                     for detail in details]
                 )
                 # Obtener el usuario asociado
-                usuario = cuota.compras.usuario
+                user = installment.purchase.user
 
                 # Crear el mensaje de notificación
-                mensaje_html = f"""<!DOCTYPE html>
+                message_html = f"""<!DOCTYPE html>
                                 <html lang="es">
                                 <head>
                                     <meta charset="UTF-8">
@@ -94,16 +94,16 @@ class Command(BaseCommand):
                                     </div>
                                     
                                     <div class="content">
-                                        <p>Estimado/a {usuario.username}</p>
-                                            <p>Con nombre: {usuario.first_name}, {usuario.last_name}</p>
-                                            <p>Le informamos que su cuota con vencimiento el <strong>{cuota.fecha_vencimiento}</strong> se encuentra <b>pendiente de pago.</b></p>
+                                        <p>Estimado/a {user.username}</p>
+                                            <p>Con nombre: {user.first_name}, {user.last_name}</p>
+                                            <p>Le informamos que su cuota con vencimiento el <strong>{installment.due_date_installment}</strong> se encuentra <b>pendiente de pago.</b></p>
                                             
                                             <p>Detalles de la cuota:</p>
                                             <ul>
-                                                <li><strong>Productos: </strong><pre>{productos}</pre></li>
-                                                <li>Número de cuota: <strong>#{cuota.nro_cuota}</strong></li>
-                                                <li>Monto adeudado: <strong>${round(cuota.monto,2):,.2f}</strong></li>
-                                                <li>Fecha de vencimiento: <strong>{cuota.fecha_vencimiento}</strong></li>
+                                                <li><strong>Productos: </strong><pre>{product}</pre></li>
+                                                <li>Número de cuota: <strong>#{installment.num_installment}</strong></li>
+                                                <li>Monto adeudado: <strong>${round(installment.amount,2):,.2f}</strong></li>
+                                                <li>Fecha de vencimiento: <strong>{installment.due_date_installment}</strong></li>
                                             </ul>
                                             
                                             <p>Le recordamos la importancia de mantener sus pagos al día para evitar recargos adicionales.</p> 
@@ -118,28 +118,28 @@ class Command(BaseCommand):
                                 </body>
                                 </html>  
                 """
-                mensaje = f"""Estimado/a {usuario.username}, Le informamos que su cuota con vencimiento el {cuota.fecha_vencimiento} se encuentra pendiente de pago.
-                Número de cuota: #{cuota.nro_cuota},Monto adeudado: ${cuota.monto:,.2f}, Fecha de vencimiento: <strong>{cuota.fecha_vencimiento},
+                message = f"""Estimado/a {user.username}, Le informamos que su cuota con vencimiento el {installment.due_date_installment} se encuentra pendiente de pago.
+                Número de cuota: #{installment.num_installment},Monto adeudado: ${installment.amount:,.2f}, Fecha de vencimiento: <strong>{installment.due_date_installment},
                 Le recordamos la importancia de mantener sus pagos al día para evitar recargos adicionales."""
                 # Crear notificación en el sistema
-                Notificacion.objects.create(
-                    usuario=usuario,
-                    compra=cuota.compras,
-                    cuota=cuota,
-                    mensaje=mensaje
+                Notification.objects.create(
+                    user=user,
+                    purchase=installment.purchase,
+                    installment=installment,
+                    message=message
                 )
 
                 # Enviar correo al usuario
-                enviar_correo(
-                    email_destino=str(usuario.email),
-                    asunto='Notificación: Su cuota está vencida',
-                    mensaje_html=mensaje_html
+                sendEmail(
+                    destination_email=str(user.email),
+                    subject='Notificación: Su cuota está vencida',
+                    message_html=message_html
                 )
 
             # Imprimir el resultado de la operación
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Se actualizaron {cuotas_vencidas.count()} cuotas vencidas."
+                    f"Se actualizaron {due_installment.count()} cuotas vencidas."
                 )
             )
         except Exception as e:

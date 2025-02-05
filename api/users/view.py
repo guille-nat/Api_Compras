@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from api.users.models import CustomUser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -6,7 +6,7 @@ from .serializers import UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     # Permitir creación de usuarios sin autenticación
     permission_classes = [AllowAny]
@@ -17,10 +17,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]  # Requerir autenticación para todo lo demás
 
     def get_queryset(self):
-        if self.request.user.is_superuser:  # Mostrar todos los usuarios si es superusuario
-            return User.objects.all()
-        # Mostrar solo el usuario autenticado
-        return User.objects.filter(id=self.request.user.id)
+        return CustomUser.objects.all() if self.request.user.is_superuser else CustomUser.objects.filter(id=self.request.user.id)
 
     def destroy(self, request, *args, **kwargs):
         try:
@@ -43,8 +40,8 @@ class UserViewSet(viewsets.ModelViewSet):
             username = instance.username
             instance.delete()
             return Response(
-                {'error': f'Usuario {username} fue eliminado con éxito.'},
-                status=status.HTTP_204_NO_CONTENT
+                {'message': f'Usuario {username} fue eliminado con éxito.'},
+                status=status.HTTP_200_OK
             )
         except Exception as e:
             # Captura cualquier excepción y devuelve un error 500

@@ -1,12 +1,11 @@
-from django.contrib.auth.models import User
+from .models import CustomUser
 from rest_framework import serializers
 from django.db import transaction
-from django.utils import timezone
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = CustomUser
         fields = [
             'id', 'username', 'email',
             'password', 'first_name', 'last_name'
@@ -20,17 +19,15 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Crear el usuario
         with transaction.atomic():
-            # password = validated_data.pop('password')
+            password = validated_data.pop('password')
 
-            user = User.objects.create_user(
+            user = CustomUser.objects.create_user(
                 username=validated_data['username'],
                 email=validated_data.get('email'),
                 password=validated_data['password'],
                 first_name=validated_data.get('first_name', ''),
-                last_name=validated_data.get('last_name', ''),
-                last_login=timezone.now()
+                last_name=validated_data.get('last_name', '')
             )
-            # user.set_password(password)
+            user.set_password(password)
 
-            # Crear el perfil asociado si los datos del perfil están presentes
             return user
