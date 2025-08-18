@@ -10,7 +10,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = True  # Cambiar en producción a False
+DEBUG = os.getenv("DEBUG", "False") == "True"  # Cambiar en producción a False
 
 ALLOWED_HOSTS = ["*"]  # Cambiar en producción
 
@@ -70,14 +70,17 @@ WSGI_APPLICATION = 'SistemaCompras.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("NAME"),
-        "USER": os.getenv("USER"),
-        "PASSWORD": os.getenv("PASSWORD"),
-        'HOST': 'localhost',  # Cambiar al nombre de host de la DB en producción
-        'PORT': '3306',
-
+        "NAME": os.getenv("MYSQL_DATABASE"),
+        "USER": os.getenv("MYSQL_USER"),
+        "PASSWORD": os.getenv("MYSQL_PASSWORD"),
+        'HOST': os.getenv("MYSQL_HOST"),
+        'PORT': os.getenv("MYSQL_PORT")
     }
 }
+DATABASES['default']['TEST'] = {
+    'NAME': f'{os.getenv("MYSQL_DATABASE")}_test',
+}
+
 
 # Agrupar migraciones en una sola carpeta
 MIGRATION_MODULES = {
@@ -129,7 +132,15 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '10000/day',
+        'anon': '5000/day',
+    },
+    **({'DEFAULT_RENDERER_CLASSES': ['rest_framework.renderers.JSONRenderer']} if not DEBUG else {})
 }
 
 
@@ -141,7 +152,7 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": os.getenv('SECRET_KEY'),
+    "SIGNING_KEY": os.getenv('SECRET_KEY_JWT'),
 }
 
 LANGUAGE_CODE = 'es-ar'
@@ -153,8 +164,14 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
-
+STORAGES = {
+    "default": {"SistemaCompras": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"SistemaCompras": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
+}
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -164,3 +181,16 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+LOGGING = {
+    "version": 2.0,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+        "django.security": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+    },
+}
