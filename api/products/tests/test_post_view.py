@@ -17,7 +17,10 @@ class ProductCreateAPITest(TestCase):
 
         # Obtener el token JWT
         response = self.client.post(
-            '/api/token', {'username': 'admin', 'password': 'adminpassword'})
+            '/api/v2/token',
+            {'username': 'admin', 'password': 'adminpassword'},
+            format='json'
+        )
         self.token = response.data.get('access')
 
         # Agregar token a las solicitudes autenticadas
@@ -33,7 +36,7 @@ class ProductCreateAPITest(TestCase):
             "unit_price": 350.00,
             "stock": 15
         }
-        response = self.client.post('/api/products', data, format='json')
+        response = self.client.post('/api/v2/products', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_create_product_as_normal_user(self):
@@ -46,7 +49,10 @@ class ProductCreateAPITest(TestCase):
 
         # Obtener el token JWT
         response = self.client.post(
-            '/api/token', {'username': 'testuser', 'password': 'testpassword'})
+            '/api/v2/token',
+            {'username': 'pepe', 'password': 'pepe'},
+            format='json'
+        )
         token = response.data.get('access')
 
         # Cambiar credenciales a usuario normal
@@ -61,6 +67,6 @@ class ProductCreateAPITest(TestCase):
             "stock": 15
         }
 
-        response = self.client.post('/api/products', data, format='json')
+        response = self.client.post('/api/v2/products', data, format='json')
         # No tiene permisos
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

@@ -7,6 +7,7 @@ from ..models import Product
 class ProductAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
+        Product.objects.all().delete()
         self.product = Product.objects.create(
             product_code="PLA-NIK-AZU-S",
             name="razer viper",
@@ -18,7 +19,10 @@ class ProductAPITest(TestCase):
 
     def test_list_product(self):
         """Verifica que la API lista los productos correctamente"""
-        response = self.client.get("/api/products")
+        response = self.client.get("/api/v2/products")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['name'], "razer viper")
+
+        # revisar dentro de results
+        results = response.data.get("results", response.data)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["name"], "razer viper")
