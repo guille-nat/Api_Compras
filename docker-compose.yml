@@ -1,0 +1,49 @@
+name: SistemaCompras
+services:
+  db:
+    container_name: DB_API_COMPRAS
+    image: mysql:8.0
+    env_file:
+      - .env
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - db_api_compras:/var/lib/mysql
+    expose:
+      - "3306"        
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api_compras_network
+    restart: always
+
+  backend:
+    container_name: Backend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+      - static_volume_backend:/app/static
+      - media_volume_backend:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    networks:
+      - api_compras_network
+    restart: always
+
+volumes:
+  db_api_compras:
+  static_volume_backend:
+  media_volume_backend:
+
+networks:
+  api_compras_network:
+    driver: bridge
