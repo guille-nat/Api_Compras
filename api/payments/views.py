@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 class PaymentInstallmentViewSet(viewsets.ModelViewSet):
     serializer_class = PaymentSerializer
-    queryset = Payment.objects.all()
+    queryset = Payment.objects.all().order_by("installment")
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):

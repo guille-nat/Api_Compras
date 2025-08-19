@@ -6,7 +6,7 @@ from rest_framework import viewsets
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by("brand")
     serializer_class = ProductSerializer
 
     def get_permissions(self):

@@ -6,7 +6,6 @@ from .serializers import UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     # Permitir creación de usuarios sin autenticación
     permission_classes = [AllowAny]
@@ -17,7 +16,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]  # Requerir autenticación para todo lo demás
 
     def get_queryset(self):
-        return CustomUser.objects.all() if self.request.user.is_superuser else CustomUser.objects.filter(id=self.request.user.id)
+        return CustomUser.objects.all().order_by("username") if self.request.user.is_superuser else CustomUser.objects.filter(id=self.request.user.id)
 
     def destroy(self, request, *args, **kwargs):
         try:
