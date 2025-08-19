@@ -50,8 +50,7 @@ class Payment(models.Model):
         installment (ForeignKey): Relación con el modelo Cuotas para identificar a qué compra pertenece el pago.
         payment_date (DateField): Fecha en la que se realizó el pago.
         amount (DecimalField): Monto total pagado por el usuario en este pago.
-        payment_methods (CharField): Método utilizado para realizar el pago (Efectivo, Tarjeta, Transferencia).
-    """
+        payment_methods (CharField): Método utilizado para realizar el pago (Efectivo, Tarjeta, Transferencia).    """
     PAYMENT_METHODS = [
         ('EFECTIVO', 'EFECTIVO'),
         ('TARJETA', 'TARJETA'),
