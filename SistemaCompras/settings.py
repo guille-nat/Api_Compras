@@ -7,12 +7,11 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
-
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-key-change-me")
 
 DEBUG = os.getenv("DEBUG", "False") == "True"  # Cambiar en producción a False
 
-ALLOWED_HOSTS = ["*"]  # Cambiar en producción
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
 
 INSTALLED_APPS = [
@@ -74,12 +73,18 @@ DATABASES = {
         "USER": os.getenv("MYSQL_USER"),
         "PASSWORD": os.getenv("MYSQL_PASSWORD"),
         'HOST': os.getenv("MYSQL_HOST"),
-        'PORT': os.getenv("MYSQL_PORT")
+        'PORT': os.getenv("MYSQL_PORT"),
+        "OPTIONS": {"charset": "utf8mb4"},
     }
 }
-DATABASES['default']['TEST'] = {
-    'NAME': f'{os.getenv("MYSQL_DATABASE")}_test',
-}
+
+if os.getenv("USE_SQLITE_FOR_TESTS") == "1":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
+    }
 
 
 # Agrupar migraciones en una sola carpeta
@@ -142,7 +147,7 @@ REST_FRAMEWORK = {
     ),
 
     # Pagination
-    'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.StandardResultsSetPagination',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
 
     # Throttling
@@ -166,7 +171,7 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
 
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": os.getenv('SECRET_KEY_JWT'),
+    "SIGNING_KEY": os.getenv("SECRET_KEY_JWT", SECRET_KEY),
 }
 
 LANGUAGE_CODE = 'es-ar'
@@ -177,34 +182,63 @@ USE_I18N = True
 
 USE_TZ = True
 
+STATIC_URL = "/static/"
+# Carpeta donde collectstatic junta todo para servir en prod
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# (Opcional) si tenés una carpeta de fuentes estáticas dentro del repo:
+# borra esta línea si no existe BASE_DIR/static
+STATICFILES_DIRS = [BASE_DIR / "static"]
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 STORAGES = {
-    "default": {"SistemaCompras": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"SistemaCompras": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {
+            "location": MEDIA_ROOT,
+            "base_url": MEDIA_URL,
+        },
+    },
+    "staticfiles": {
+        # Para producción es mejor ManifestStaticFilesStorage (hash en nombres)
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        # Si preferís sin manifest en local, podés usar:
+        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
 }
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 LOGGING = {
-    "version": 2.0,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {"class": "logging.StreamHandler"},
+    'version': 1,  # <-- tiene que ser 1 (entero), no "1" ni 2.0
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[{levelname}] {asctime} {name}: {message}',
+            'style': '{',
+        },
     },
-    "root": {"handlers": ["console"], "level": "INFO"},
-    "loggers": {
-        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
-        "django.security": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',        # o 'DEBUG' en dev
+            'propagate': True,
+        },
+        # opcional: tus apps
+        # 'api': {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False},
     },
 }

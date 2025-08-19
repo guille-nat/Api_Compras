@@ -7,7 +7,7 @@ from drf_yasg import openapi
 schema_view = get_schema_view(
     openapi.Info(
         title="Sistema de Compras API",
-        default_version='v1',
+        default_version='v2',
         description="API diseñada para la gestión de compras, pagos, cuotas, inventario y usuarios.\n Este proyecto incluye validaciones robustas y reglas de negocio para asegurar un manejo eficiente y seguro de las operaciones.",
         terms_of_service="https://www.nataliullacoder.com",
         contact=openapi.Contact(email="guillermonatali22@gmail.com"),
@@ -19,7 +19,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/', include("api.urls")),
+    path('api/v2/', include("api.urls")),
     path('doc', schema_view.with_ui('swagger',
          cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc',
