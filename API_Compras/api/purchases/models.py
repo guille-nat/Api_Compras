@@ -1,6 +1,8 @@
 from django.db import models
 from api.users.models import CustomUser
 from api.products.models import Product
+from django.conf import settings
+from decimal import Decimal
 
 
 class Purchase(models.Model):
@@ -10,43 +12,42 @@ class Purchase(models.Model):
     Atributos:
         user (ForeignKey): Referencia al usuario que realizó la compra.
         purchase_date (DateField): Fecha en que se realizó la compra.
-        due_date (DateField): Fecha límite para el pago.
         total_amount (DecimalField): Monto total de la compra.
         total_installments_count (int): Cantidad de cuotas en la que se divide la compra.
-        current_installment (int): La cuota en la que se encuentra el usuario.
+        status (CharFile): Estado de la compra [OPEN, PAID, CANCELLED].
         discount_applied (DecimalField): Descuento aplicado al pago, si corresponde.
-        amount_paid (DecimalField): Monto que ha sido pagado por el usuario hasta ahora.
+        updated_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue modificado el registro.
+        created_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue creado el registro.
+        updated_by (ForeignKey): Referencia al usuario que actualizo el registro.
     """
-    user = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, help_text="Usuario que realiza la compra.")
-    purchase_date = models.DateField(
-        help_text="Fecha en la cual la compra se realiza.")
-    due_date = models.DateField(
-        help_text="Fecha de vencimiento del pago.")
-    total_amount = models.DecimalField(
-        max_digits=10, decimal_places=2, help_text="Monto total de la compra.")
-    total_installments_count = models.PositiveIntegerField(
-        help_text="Total de cuotas a pagar.", default=1)
-    discount_applied = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        default=0.0,
-        help_text="Descuento aplicado en el pago, si corresponde."
-    )
-    current_installment = models.PositiveIntegerField(
-        help_text="Cuota actual en la que se encuentra el pago.", default=1)
-    amount_paid = models.DecimalField(
-        max_digits=10, decimal_places=2, help_text="Monto que se ha pagado.", default=0.00)
+    class Status(models.TextChoices):
+        OPEN = "OPEN", "OPEN"
+        PAID = "PAID", "PAID"
+        CANCELLED = "CANCELLED", "CANCELLED"
 
-    def __str__(self):
-        """
-        Representación legible del objeto Compra.
-        """
-        return f"Compra {self.id} - Usuario: {self.user.username}"
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE)
+    purchase_date = models.DateField()
+    total_amount = models.DecimalField(
+        max_digits=12, decimal_places=2, default=Decimal('0'))
+    total_installments_count = models.PositiveIntegerField(default=1)
+    status = models.CharField(
+        max_length=10, choices=Status.choices, default=Status.OPEN)
+    discount_applied = models.DecimalField(
+        max_digits=12, decimal_places=2, default=Decimal('0'))
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name="purchase_updated")
 
     class Meta:
+        indexes = [
+            models.Index(fields=['user'], name='idx_purchase_user'),
+            models.Index(fields=['status'], name='idx_purchase_status'),
+            models.Index(fields=['purchase_date'], name='idx_purchase_date'),
+        ]
         verbose_name = "Compra"
         verbose_name_plural = "Compras"
 
@@ -57,18 +58,35 @@ class PurchaseDetail(models.Model):
     Atributos:
         purchase (ForeignKey): Relación con el modelo Compra.
         product (ForeignKey): Relación con el modelo Producto.
-        cant_product (int): Cantidad del mismo producto comprada.
+        quantity (int): Cantidad del mismo producto comprada.
+        unit_price_at_purchase (DecimalField): Precio unitario del Producto.
+        subtotal (DecimalField): Subtotal del producto por la cantidad seleccionada.
+        updated_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue modificado el registro.
+        created_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue creado el registro.
+        updated_by (ForeignKey): Referencia al usuario que actualizo el registro.
     """
     purchase = models.ForeignKey(
-        Purchase, on_delete=models.CASCADE, help_text="Compra asociada al producto.", related_name='details')
+        Purchase, on_delete=models.CASCADE, help_text="Compra asociada al producto.", related_name='details', null=False)
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, help_text="Producto asociado a la compra.")
-    cant_product = models.PositiveIntegerField(
-        help_text="Cantidad del producto comprado.")
-
-    def __str__(self):
-        return f"Detalle de compra ID {self.id} - Compra ID {self.purchase.id} - Producto: {self.product.id}"
+        Product, on_delete=models.PROTECT, help_text="Producto asociado a la compra.", null=False)
+    quantity = models.PositiveIntegerField(
+        help_text="Cantidad del producto comprado.", null=False)
+    unit_price_at_purchase = models.DecimalField(
+        max_digits=10, decimal_places=2, help_text='Precio unitario del producto.', null=False)
+    subtotal = models.DecimalField(
+        max_digits=10, decimal_places=2, help_text='Subtotal de producto.')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="purchase_detail_updated"
+    )
 
     class Meta:
         verbose_name = "Detalle Compra"
         verbose_name_plural = "Detalles Compras"
+        indexes = [
+            models.Index(fields=['purchase'], name='idx_pd_purchase'),
+            models.Index(fields=['product'], name='idx_pd_product')
+        ]

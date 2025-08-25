@@ -3,10 +3,15 @@ from django.conf import settings
 
 
 class Category(models.Model):
-    """_summary_
+    """
+    Modelo para gestionar las categorías.
 
-    Args:
-        models (_type_): _description_
+    Atributos:
+        name (Charfield): Nombre de la categoría.
+        updated_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue modificado el registro.
+        created_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue creado el registro.
+        updated_by (ForeignKey): Referencia al usuario que actualizo el registro.
+        created_by (ForeignKey): Referencia al usuario que actualizo el registro.
     """
     name = models.CharField(max_length=120, null=False)
     created_at = models.DateTimeField(auto_now_add=True)

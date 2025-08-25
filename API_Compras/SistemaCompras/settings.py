@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'api.payments',  # app para pagos
     'api.users',  # app para usuarios
     'api.categories',  # app  para las categorías
+    'api.storage_location',  # app para los depósitos
+    'api.inventories',  # app para los inventarios
 ]
 # Apunta a la app 'users' y al modelo 'CustomUser'
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -96,6 +98,8 @@ MIGRATION_MODULES = {
     'payments': 'migrations.payments',
     'users': 'migrations.users',
     'categories': 'migrations.categories',
+    'storage_location': 'migrations.storage_location',
+    'inventories': 'migrations.inventories',
 }
 
 CORS_ALLOWED_ORIGINS = []

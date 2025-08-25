@@ -1,4 +1,7 @@
 from django.db import models
+from api.categories.models import Category
+from django.conf import settings
+from decimal import Decimal
 
 
 class Product(models.Model):
@@ -11,33 +14,31 @@ class Product(models.Model):
         brand (CharField): Marca del producto.
         model (CharField): Modelo específico del producto.
         unit_price (DecimalField): Precio unitario del producto.
-        stock (IntegerField): Cantidad de unidades disponibles en el inventario.
+        category (ForeignKey): Referencia a la categoría asociada.
+        updated_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue modificado el registro.
+        created_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue creado el registro.
+        created_by (ForeignKey): Referencia al usuario que creó el registro.
+        updated_by (ForeignKey): Referencia al usuario que actualizo el registro.
     """
-    product_code = models.CharField(
-        max_length=40, unique=True, help_text="Código del producto.")
-    name = models.CharField(max_length=100, help_text="Nombre del producto.")
-    brand = models.CharField(
-        max_length=45,  help_text="Marca asociada al producto.")
-    model = models.CharField(
-        max_length=100,  help_text="Modelo asociado al producto.")
+    product_code = models.CharField(max_length=120, unique=True)
+    name = models.CharField(max_length=180)
+    brand = models.CharField(max_length=120, blank=True, default="")
+    model = models.CharField(max_length=120, blank=True, default="")
     unit_price = models.DecimalField(
-        max_digits=10, decimal_places=2,  help_text="Precio del producto por unidad.")
-    stock = models.PositiveIntegerField(
-        help_text="Cantidad del producto en stock")
+        max_digits=12, decimal_places=2, default=Decimal('0'))
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
 
-    def save(self, *args, **kwargs):
-        # Convertir campos necesarios a minúsculas antes de guardar
-        self.name = self.name.lower()
-        self.brand = self.brand.lower()
-        self.model = self.model.lower()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        """
-        Representación legible del objeto Productos.
-        """
-        return f"{self.name} ({self.brand} - {self.model})"
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name="products_created")
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name="products_updated")
 
     class Meta:
-        verbose_name = "Producto"
-        verbose_name_plural = "Productos"
+        constraints = [models.UniqueConstraint(
+            fields=['product_code'], name='uq_product_code')]
+        indexes = [models.Index(fields=['category'],
+                                name='idx_product_category')]

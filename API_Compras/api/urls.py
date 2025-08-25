@@ -7,7 +7,7 @@ from api.users.view import UserViewSet
 from api.payments.views import PaymentInstallmentViewSet
 from api.products.views import ProductViewSet
 from api.purchases.views import PurchaseViewSet
-from api.categories.view import CategoryPublicViewSet, CategorySerializer
+from API_Compras.api.categories.views import CategoryPublicViewSet, CategorySerializer
 from rest_framework import routers
 
 
