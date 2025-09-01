@@ -2,14 +2,14 @@ from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from .serializer import CategoryPrivateSerializer, CategoryPublicSerializer
 from . import services, selectors
+from rest_framework.throttling import UserRateThrottle
 
 
 class CategoryPrivateViewSet(ModelViewSet):
+    queryset = selectors.list_categories_admin()
     serializer_class = CategoryPrivateSerializer
     permission_classes = [IsAdminUser]
-
-    def get_queryset(self):
-        return selectors.list_categories_admin()
+    throttle_classes = [UserRateThrottle]
 
     def perform_create(self, serializer):
         category = services.create_category(
@@ -28,8 +28,7 @@ class CategoryPrivateViewSet(ModelViewSet):
 
 
 class CategoryPublicViewSet(ReadOnlyModelViewSet):
+    queryset = selectors.list_categories_public()
+    throttle_classes = [UserRateThrottle]
     serializer_class = CategoryPublicSerializer
     permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        return selectors.list_categories_public()
