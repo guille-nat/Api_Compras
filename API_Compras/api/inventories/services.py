@@ -38,11 +38,14 @@ def transference_inventory(
         user (CustomUser): Usuario que ejecuta la transferencia (usado en auditoría).
 
     Returns:
-        dict: Un diccionario con métricas de la operación, por ejemplo:
-            {
-                "moved": <int>,              # cantidad total transferida
-                "movements_count": <int>,    # cantidad de registros InventoryMovement creados
-            }
+        dict: Respuesta estándar con información de la operación
+            - success (bool): True si la operación fue exitosa
+            - message (str): Mensaje descriptivo de la operación
+            - data (dict): Datos de la operación
+                - moved (int): Cantidad total transferida
+                - movements_count (int): Cantidad de registros InventoryMovement creados
+                - from_location (str): Ubicación origen
+                - to_location (str): Ubicación destino
 
     Raises:
         django.core.exceptions.ValidationError:
@@ -150,7 +153,17 @@ def transference_inventory(
         remaining -= take
 
     InventoryMovement.objects.bulk_create(movements)
-    return {"moved": quantity, "movements_count": len(movements)}
+    return {
+        "success": True,
+        "message": f"Transferencia completada: {quantity} unidades de {product.name} desde {from_location.name} hacia {to_location.name}.",
+        "data": {
+            "moved": quantity,
+            "movements_count": len(movements),
+            "from_location": from_location.name,
+            "to_location": to_location.name,
+            "product": product.name
+        }
+    }
 
 
 @transaction.atomic
@@ -177,7 +190,13 @@ def purchase_entry_inventory(
         user (CustomUser): Usuario que realiza la operación.
 
     Returns:
-        InventoryRecord: El registro de inventario actualizado o creado.
+        dict: Respuesta estándar con información de la operación
+            - success (bool): True si la operación fue exitosa
+            - message (str): Mensaje descriptivo de la operación
+            - data (dict): Datos de la operación
+                - inventory (InventoryRecord): Registro de inventario actualizado o creado
+                - quantity_added (int): Cantidad agregada
+                - location (str): Ubicación de almacenamiento
 
     Raises:
         ValidationError: Si `quantity` <= 0, `reference_id` inválido,
@@ -242,7 +261,16 @@ def purchase_entry_inventory(
         updated_by=user,
     )
 
-    return {"inventory": inventory_record}
+    return {
+        "success": True,
+        "message": f"Entrada de compra registrada: {quantity} unidades de {product.name} en {to_location.name}.",
+        "data": {
+            "inventory": inventory_record,
+            "quantity_added": quantity,
+            "location": to_location.name,
+            "product": product.name
+        }
+    }
 
 
 @transaction.atomic
@@ -272,11 +300,14 @@ def exit_sale_inventory(
         user (CustomUser): Usuario ejecutor de la operación (para auditoría).
 
     Returns:
-        dict: Diccionario con métricas de la operación:
-            {
-                "moved": <int>,              # cantidad total egresada
-                "movements_count": <int>,    # cantidad de movimientos generados
-            }
+        dict: Respuesta estándar con información de la operación
+            - success (bool): True si la operación fue exitosa
+            - message (str): Mensaje descriptivo de la operación
+            - data (dict): Datos de la operación
+                - moved (int): Cantidad total egresada
+                - movements_count (int): Cantidad de movimientos generados
+                - from_location (str): Ubicación origen
+                - product (str): Nombre del producto
 
     Raises:
         django.core.exceptions.ValidationError:
@@ -359,7 +390,16 @@ def exit_sale_inventory(
         remaining -= take
 
     InventoryMovement.objects.bulk_create(movements)
-    return {"moved": quantity, "movements_count": len(movements)}
+    return {
+        "success": True,
+        "message": f"Salida por venta registrada: {quantity} unidades de {product.name} desde {from_location.name}.",
+        "data": {
+            "moved": quantity,
+            "movements_count": len(movements),
+            "from_location": from_location.name,
+            "product": product.name
+        }
+    }
 
 
 @transaction.atomic
@@ -416,11 +456,14 @@ def adjustment_inventory(
             - Si `modify_location` no existe en base de datos.
 
     Returns:
-        dict: Diccionario con los objetos afectados:
-            {
-                "inventory": InventoryRecord,   # Registro actualizado tras el ajuste
-                "movement": InventoryMovement,  # Movimiento de inventario generado
-            }
+        dict: Respuesta estándar con información de la operación
+            - success (bool): True si la operación fue exitosa
+            - message (str): Mensaje descriptivo de la operación
+            - data (dict): Datos de la operación
+                - inventory (InventoryRecord): Registro actualizado tras el ajuste
+                - movement (InventoryMovement): Movimiento de inventario generado
+                - adjustment_type (str): Tipo de ajuste realizado
+                - quantity_adjusted (int): Cantidad ajustada
     """
     if not isinstance(quantity, int) or quantity <= 0:
         raise exceptions.ValidationError("La cantidad debe ser un entero > 0.")
@@ -503,7 +546,19 @@ def adjustment_inventory(
             updated_by=user,
         )
 
-        return {"inventory": inventory_record, "movement": movement}
+        adjustment_type = "Agregar" if aggregate else ("Quitar" if remove else "Ajustar Otro")
+        return {
+            "success": True,
+            "message": f"Ajuste de inventario completado: {adjustment_type} {quantity} unidades de {product.name} en {from_location.name}.",
+            "data": {
+                "inventory": inventory_record,
+                "movement": movement,
+                "adjustment_type": adjustment_type,
+                "quantity_adjusted": quantity,
+                "location": from_location.name,
+                "product": product.name
+            }
+        }
 
 
 @transaction.atomic
@@ -530,7 +585,14 @@ def return_output_inventory(
         user (CustomUser): Usuario que realiza la operación.
 
     Returns:
-        InventoryRecord: El registro de inventario actualizado tras la salida.
+        dict: Respuesta estándar con información de la operación
+            - success (bool): True si la operación fue exitosa
+            - message (str): Mensaje descriptivo de la operación
+            - data (dict): Datos de la operación
+                - inventory (InventoryRecord): Registro de inventario actualizado
+                - movement (InventoryMovement): Movimiento de inventario generado
+                - quantity_removed (int): Cantidad retirada
+                - location (str): Ubicación origen
 
     Raises:
         ValidationError:
@@ -614,7 +676,17 @@ def return_output_inventory(
     )
     inventory_record.refresh_from_db(fields=["quantity"])
 
-    return {"inventory": inventory_record, "movement": movement}
+    return {
+        "success": True,
+        "message": f"Salida por devolución registrada: {quantity} unidades de {product.name} desde {from_location.name}.",
+        "data": {
+            "inventory": inventory_record,
+            "movement": movement,
+            "quantity_removed": quantity,
+            "location": from_location.name,
+            "product": product.name
+        }
+    }
 
 
 @transaction.atomic
@@ -644,7 +716,14 @@ def return_entry_inventory(
         user (CustomUser): Usuario que ejecuta la operación.
 
     Returns:
-        InventoryRecord: El registro de inventario creado o actualizado.
+        dict: Respuesta estándar con información de la operación
+            - success (bool): True si la operación fue exitosa
+            - message (str): Mensaje descriptivo de la operación
+            - data (dict): Datos de la operación
+                - inventory (InventoryRecord): Registro de inventario creado o actualizado
+                - movement (InventoryMovement): Movimiento de inventario generado
+                - quantity_added (int): Cantidad agregada
+                - location (str): Ubicación destino
 
     Raises:
         ValidationError:
@@ -734,4 +813,14 @@ def return_entry_inventory(
         updated_by=user,
     )
 
-    return {"inventory": inventory_record, "movement": movement}
+    return {
+        "success": True,
+        "message": f"Entrada por devolución registrada: {quantity} unidades de {product.name} en {to_location.name}.",
+        "data": {
+            "inventory": inventory_record,
+            "movement": movement,
+            "quantity_added": quantity,
+            "location": to_location.name,
+            "product": product.name
+        }
+    }
