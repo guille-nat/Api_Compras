@@ -16,7 +16,12 @@ def create_category(*, user, name: str) -> Category:
         exceptions.ValidationError: Validación de existencia.
 
     Returns:
-        Category: Retorna el objeto de la nueva categoría ya creada.
+        dict: Respuesta estándar con información de la operación
+            - success (bool): True si la operación fue exitosa
+            - message (str): Mensaje descriptivo de la operación
+            - data (dict): Datos de la operación
+                - category (Category): Objeto de la nueva categoría creada
+                - name (str): Nombre de la categoría creada
     """
     name_norm = name.strip().lower()
     # unicidad case-sensitive
@@ -29,7 +34,14 @@ def create_category(*, user, name: str) -> Category:
         created_by=user,
         updated_by=user
     )
-    return category
+    return {
+        "success": True,
+        "message": f"Categoría '{name_norm}' creada exitosamente.",
+        "data": {
+            "category": category,
+            "name": category.name
+        }
+    }
 
 
 @transaction.atomic
@@ -46,8 +58,15 @@ def rename_category(*, user, category: Category, new_name: str) -> Category:
         exceptions.ValidationError: Excepción a la hora de validar existencia del nuevo nombre en otra categoría
 
     Returns:
-        Category: Retorna el objeto de la categoría ya actualizada con el nuevo nombre.
+        dict: Respuesta estándar con información de la operación
+            - success (bool): True si la operación fue exitosa
+            - message (str): Mensaje descriptivo de la operación
+            - data (dict): Datos de la operación
+                - category (Category): Objeto de la categoría actualizada
+                - old_name (str): Nombre anterior de la categoría
+                - new_name (str): Nuevo nombre de la categoría
     """
+    old_name = category.name
     new_name = new_name.strip().lower()
     if Category.objects.exclude(pk=category.pk).filter(name__iexact=new_name).exists():
         raise exceptions.ValidationError(
@@ -55,4 +74,12 @@ def rename_category(*, user, category: Category, new_name: str) -> Category:
     category.name = new_name
     category.updated_by = user
     category.save(update_fields=["name", "updated_by", "updated_at"])
-    return category
+    return {
+        "success": True,
+        "message": f"Categoría renombrada de '{old_name}' a '{new_name}' exitosamente.",
+        "data": {
+            "category": category,
+            "old_name": old_name,
+            "new_name": new_name
+        }
+    }
