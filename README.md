@@ -368,7 +368,7 @@ Este proyecto está bajo la Licencia MIT. Ver archivo [LICENSE](LICENSE) para m�
 
 - **Guillermo Natali** - *Desarrollo principal* - [@guille-nat](https://github.com/guille-nat)
 
----<gutierrezfalopaalberto@gmail.com>
+---<guillermonatali22@gmail.com>
 
 ## 🙏 Agradecimientos
 
@@ -382,10 +382,6 @@ Este proyecto está bajo la Licencia MIT. Ver archivo [LICENSE](LICENSE) para m�
 
 - **Issues**: [GitHub Issues](https://github.com/guille-nat/Api_Compras/issues)
 - **Documentación**: [Wiki del Proyecto](https://github.com/guille-nat/Api_Compras/wiki)
-- **Email**: <gutierrezfalopaalberto@gmail.com>
+- **Email**: <guillermonatali22@gmail.com>
+- **Web**: [nataliullacoder.com](https://nataliullacoder.com/)
 
----
-
-<p align="center">
-  Hecho con ❤️ usando Django y DRF
-</p>
