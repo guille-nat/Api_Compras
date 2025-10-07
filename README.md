@@ -16,12 +16,10 @@
 
 ### 🚀 **Alto Rendimiento**
 
-
 - **Cache Redis** con invalidación inteligente y métricas en tiempo real
 - **Optimización de consultas** con `select_related` y `prefetch_related`
 - **Paginación eficiente** para grandes volúmenes de datos
 - **Arquitectura escalable** lista para microservicios
-
 
 ### 📊 **Business Intelligence**
 
@@ -29,7 +27,6 @@
 - **Gráficos profesionales** con Matplotlib integrados en Excel
 - **Analíticas avanzadas**: rotación de productos, ventas, mora, inventario
 - **Multi-formato**: Excel, PNG, ZIP, JSON
-
 
 ### 🔐 **Seguridad Empresarial**
 
@@ -116,25 +113,21 @@ docker-compose logs -f backend
 
 **📖 Guía completa**: Ver [Documentación de Instalación](doc/INSTALLATION.md)
 
-
 ---
 
 ## 🛠️ Stack Tecnológico
 
 ### Backend
 
-
 - **Django 5.1.5** - Framework web robusto y escalable
 - **Django REST Framework 3.15.2** - API REST con todas las funcionalidades
 - **Celery 5.5.3** - Procesamiento asíncrono de tareas
 - **Redis 7** - Cache de alta velocidad y message broker
 
-
 ### Base de Datos
 
 - **MySQL 9.0** - Base de datos relacional principal
 - **django-redis 6.0.0** - Backend de cache optimizado
-
 
 ### Analíticas
 
@@ -187,7 +180,6 @@ SistemaCompra/
 
 ### Módulos Principales
 
-
 #### 📊 Analytics (Reportes Asíncronos)
 
 - Rotación de productos por ubicación
@@ -199,7 +191,6 @@ SistemaCompra/
 - Reporte de cuotas vencidas con mora
 
 #### 🚀 Cache System
-
 
 - Invalidación inteligente por patrones
 - Métricas de rendimiento en tiempo real
@@ -229,9 +220,9 @@ SistemaCompra/
 ### Guías Principales
 
 | Documento | Descripción |
-|-----------|-----<http://localhost:8000/api/v2/schema/swagger-ui/>
-| [📥 Instala<http://localhost:8000/api/v2/schema/redoc/> de instalación local y Docker |
-| [🏗️ Arquitectura](d<http://localhost:8000/api/v2/schema/>tema y decisiones técnicas |
+|-----------|-------------|
+| [📥 Instalación](doc/INSTALLATION.md) | Guía de instalación local y Docker |
+| [🏗️ Arquitectura](doc/ARCHITECTURE.md) | Diseño del sistema y decisiones técnicas |
 | [🚀 Cache Redis](doc/CACHE.md) | Sistema de cache y optimización |
 | [📊 Analytics](doc/ANALYTICS.md) | Reportes asíncronos con Celery |
 | [🔐 Autenticación](doc/AUTHENTICATION.md) | JWT, permisos y seguridad |
