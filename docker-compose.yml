@@ -45,8 +45,7 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    # environment:
-    #   - REDIS_PASSWORD=S2yU-un9jDA-IU-8tpKEg-b-EGej5cUI8-8Jju-k-U9-3MU-b-zzUUg-Redis2025
+    
     env_file:
       - ./API_Compras/.env
     volumes:
@@ -61,7 +60,7 @@ services:
       - api_compras_network
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "S2yU-un9jDA-IU-8tpKEg-b-EGej5cUI8-8Jju-k-U9-3MU-b-zzUUg-Redis2025", "ping"]
+      test: ["CMD", "redis-cli", "-a", "[password_redis]", "ping"]
       interval: 5s
       timeout: 2s
       retries: 5
