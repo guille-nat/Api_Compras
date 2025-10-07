@@ -169,31 +169,34 @@ class PromotionRule(models.Model):
         type (CharField): Tipo de regla que se le aplica a la promoción (PERCENTAGE, AMOUNT, FIRST_PURCHASE) 
             [solo a PERCENTAGE se tratara el value como un porcentaje, el resto se tomara como un monto fijo de descuento].
         value (DecimalFile): Valor de descuento que se aplica.
-        priority (IntegerField): Valor de prioridad, mientras más alto el valor mayor prioridad posee.
+        priority (PositiveIntegerField): Valor de prioridad, mientras más alto el valor mayor prioridad posee.
         start_at (DateTimeField): Fecha y hora en la que comienza la promoción.
         end_at (DateTimeField): Fecha y hora en la que termina la promoción.
+        acumulable (BooleanField): Indica si la promoción es acumulable con otras promociones.
         updated_by (ForeignKey): Referencia al usuario que actualizo el registro.
         created_by (ForeignKey): Referencia al usuario que actualizo el registro.
         updated_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue modificado el registro.
         created_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue creado el registro.
     """
-    TYPE = [
-        ('PG', 'PERCENTAGE'),
-        ('AM', 'AMOUNT'),
-        ('FP', 'FIRST_PURCHASE')
-    ]
+    class Type(models.TextChoices):
+        PERCENTAGE = "PERCENTAGE", "PERCENTAGE"
+        AMOUNT = "AMOUNT", "AMOUNT"
+        FIRST_PURCHASE = "FIRST_PURCHASE", "FIRST_PURCHASE"
+
     promotion = models.ForeignKey(
         Promotion, on_delete=models.CASCADE, help_text='Identificador de la promoción.')
-    type = models.CharField(choices=TYPE, null=False,
+    type = models.CharField(max_length=20, choices=Type.choices, null=False,
                             help_text='Tipo de regla.')
     value = models.DecimalField(max_digits=12, decimal_places=2,
                                 null=False, help_text='Valor que se le aplica al descuento.')
-    priority = models.IntegerField(
+    priority = models.PositiveIntegerField(
         default=100, null=False, help_text='Prioridad que se le aplica al descuento.')
     start_at = models.DateTimeField(
         null=False, help_text='Fecha y hora que empieza la promoción.')
     end_at = models.DateTimeField(
         null=False, help_text='Fecha en la que termina la promoción.')
+    acumulable = models.BooleanField(
+        default=False, null=False, help_text='Indica si la promoción es acumulable con otras promociones.')
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -214,6 +217,5 @@ class PromotionRule(models.Model):
         indexes = [
             models.Index(fields=['promotion'], name='idx_pr_promo'),
             models.Index(fields=['priority'], name='idx_pr_priority'),
-            models.Index(fields=['star_at', 'end_at'], name='idx_pr_range')
-
+            models.Index(fields=['start_at', 'end_at'], name='idx_pr_range')
         ]

@@ -19,15 +19,16 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Crear el usuario
         with transaction.atomic():
+            # Extraer la contraseña y pasarla correctamente a create_user
             password = validated_data.pop('password')
 
             user = CustomUser.objects.create_user(
-                username=validated_data['username'],
+                username=validated_data.get('username'),
                 email=validated_data.get('email'),
-                password=validated_data['password'],
+                password=password,
                 first_name=validated_data.get('first_name', ''),
                 last_name=validated_data.get('last_name', '')
             )
-            user.set_password(password)
 
+            # create_user ya guarda la contraseña hasheada; simplemente devolver la instancia
             return user

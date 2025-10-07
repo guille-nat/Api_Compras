@@ -73,6 +73,8 @@ class StorageLocation(models.Model):
         ]
         indexes = [
             models.Index(fields=['parent'], name='idx_location_parent'),
+            models.Index(fields=['type'], name='idx_location_type'),
+            models.Index(fields=['name'], name='idx_location_name'),
         ]
         ordering = ['name']
 
@@ -81,7 +83,7 @@ class StorageLocation(models.Model):
 
     def clean(self):
         # Guardrail mínimo: no permitas que el padre sea uno mismo
-        if self.parent_id and self.parent_id == self.id:
+        if self.parent_id and self.parent_id == self.pk:
             from django.core.exceptions import ValidationError
             raise ValidationError(
                 "El depósito no puede ser padre de sí mismo.")

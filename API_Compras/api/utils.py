@@ -1,23 +1,13 @@
-from django.core.mail import send_mail
-from django.http import HttpResponse
-import os
-from dotenv import load_dotenv
+from .models import NotificationTemplate
+from django.shortcuts import get_object_or_404
 
 
-def sendEmail(destination_email, subject, message_html):
-    """
-    Envía un correo usando la API de Resend.
-    """
-    try:
-        load_dotenv()
-        send_mail(
-            subject=subject,
-            message='',
-            from_email=os.getenv('EMAIL_HOST_USER'),
-            recipient_list=[destination_email],
-            fail_silently=False,
-            html_message=message_html
-        )
-        return HttpResponse('Correo enviado con éxito')
-    except Exception as e:
-        print(f"Error enviando el correo: {e}")
+def validate_id(id: int, name: str = "ID") -> None:
+    if id is None or not isinstance(id, int) or id <= 0:
+        raise ValueError(f"{name} ID must be a positive integer")
+
+
+def get_notification_by_code(code: str) -> NotificationTemplate:
+    if not code or not isinstance(code, str):
+        raise ValueError("Code must be a non-empty string")
+    return get_object_or_404(NotificationTemplate, code=code, active=True)

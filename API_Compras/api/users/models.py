@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils import timezone
 
 
 class CustomUser(AbstractUser):
@@ -10,6 +9,11 @@ class CustomUser(AbstractUser):
         self.first_name = self.first_name.lower()
         self.last_name = self.last_name.lower()
         super().save(*args, **kwargs)
+
+    def full_name(self):
+        if not self.first_name and not self.last_name:
+            return "N/A"
+        return f"{self.first_name} {self.last_name}".title()
 
     class Meta:
         constraints = [

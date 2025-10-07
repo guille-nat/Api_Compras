@@ -1,0 +1,26 @@
+[run]
+source = .
+omit = 
+    */migrations/*
+    */media/*
+    */static/*
+    */staticfiles/*
+    */templates/*
+    manage.py
+    verify_imports.py
+    */venv/*
+    */env/*
+    */__pycache__/*
+    run_optimized_tests.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+
+ignore_errors = True
+
+[html]
+directory = htmlcov

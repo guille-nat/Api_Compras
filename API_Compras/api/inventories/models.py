@@ -45,7 +45,7 @@ class InventoryRecord(models.Model):
     class Meta:
         verbose_name = "Inventario"
         verbose_name_plural = "Inventarios"
-        ordering = ['product']
+        ordering = ['product', '-quantity']
         constraints = [
             models.UniqueConstraint(
                 fields=['product', 'location', 'batch_code', 'expiry_date'],

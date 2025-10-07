@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛒 Sistema de Compras API v2.1.0 | Professional REST API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.25);
+            --glow: rgba(102, 126, 234, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            padding: 3rem 0 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            letter-spacing: -2px;
+            line-height: 1.1;
+        }
+
+        .header h1 span {
+            background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .version-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.4rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px var(--shadow);
+            animation: fadeIn 1s ease, float 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .badge:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px var(--shadow-lg);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .badge-primary {
+            background: white;
+            color: var(--primary);
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 25px 70px var(--shadow-lg);
+            padding: 3.5rem;
+            margin: 2rem 0;
+            animation: fadeInUp 0.8s ease;
+            position: relative;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--primary));
+            border-radius: 25px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .main-content:hover::before {
+            opacity: 0.1;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 15px;
+        }
+
+        .tech-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .tech-item:hover {
+            transform: translateY(-5px) scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tech-item:hover .tech-icon {
+            transform: rotateY(360deg);
+        }
+
+        .tech-icon {
+            transition: transform 0.6s ease;
+            font-size: 2.5rem;
+        }
+
+        .tech-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .tech-version {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            background-clip: padding-box;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            opacity: 0.8;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            /* background: linear-gradient(135deg, var(--primary), var(--secondary)); */
+            border-radius: 20px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 20px 40px var(--shadow-lg), 0 0 0 1px rgba(102, 126, 234, 0.1);
+        }
+
+        .feature-card:hover::before {
+            width: 100%;
+            opacity: 0.08;
+        }
+
+        .feature-card:hover::after {
+            opacity: 1;
+        }
+
+        .feature-card:hover h3 {
+            color: var(--primary-dark);
+            transform: translateX(5px);
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .feature-card ul li {
+            padding: 0.5rem 0;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .feature-card ul li::before {
+            content: "✓";
+            color: var(--success);
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .highlight-banner {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border: 2px solid var(--border);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px var(--shadow);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .highlight-banner:hover::before {
+            left: 100%;
+        }
+
+        .highlight-banner:hover {
+            box-shadow: 0 12px 35px var(--shadow-lg);
+            transform: translateY(-3px);
+        }
+
+        .highlight-banner strong {
+            color: var(--primary);
+            font-size: 1.05rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.9rem 1.8rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn.secondary {
+            background: var(--success);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn.ghost {
+            background: var(--info);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+        }
+
+        .btn.warning {
+            background: var(--warning);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+        }
+
+        .btn:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn.secondary:hover {
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn.ghost:hover {
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn.warning:hover {
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 4rem 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 6px;
+            height: 3rem;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            border-radius: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+            padding: 2.5rem 1.5rem;
+            border-radius: 18px;
+            text-align: center;
+            border: 2px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 35px var(--shadow-lg);
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+        }
+
+        .stat-card:hover .stat-number {
+            transform: scale(1.15);
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Poppins', sans-serif;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 3rem 0;
+            opacity: 0.95;
+            margin-top: 3rem;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, white, transparent);
+            border-radius: 2px;
+        }
+
+        .footer p {
+            margin: 0.8rem 0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer p:hover {
+            transform: scale(1.05);
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0 5px;
+        }
+
+        .footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: white;
+            transition: width 0.3s ease;
+        }
+
+        .footer a:hover::after {
+            width: 100%;
+        }
+
+        .footer a:hover {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            color: var(--primary);
+        }
+
+        .system-overview {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 3rem;
+            border-radius: 20px;
+            margin: 2rem 0;
+            border-left: 8px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .system-overview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .system-overview:hover::before {
+            opacity: 1;
+        }
+
+        .system-overview:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px var(--shadow);
+        }
+
+        .system-overview h2 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .system-overview p {
+            color: #4b5563;
+            line-height: 1.9;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .header-icon {
+                font-size: 3rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .tech-stack {
+                gap: 1rem;
+                padding: 1.5rem;
+            }
+
+            .tech-item {
+                font-size: 0.85rem;
+            }
+
+            .version-info {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .highlight-banner {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.75rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 2rem;
+                border-radius: 15px;
+            }
+
+            .system-overview {
+                padding: 2rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .header-icon:hover {
+            animation: bounce 0.5s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .feature-card,
+        .stat-card,
+        .tech-item {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+        .feature-card:nth-child(7) { animation-delay: 0.1s; }
+        .feature-card:nth-child(8) { animation-delay: 0.2s; }
+        .feature-card:nth-child(9) { animation-delay: 0.3s; }
+        .feature-card:nth-child(10) { animation-delay: 0.4s; }
+        .feature-card:nth-child(11) { animation-delay: 0.5s; }
+        .feature-card:nth-child(12) { animation-delay: 0.6s; }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        .stat-card:nth-child(5) { animation-delay: 0.5s; }
+        .stat-card:nth-child(6) { animation-delay: 0.6s; }
+
+        ::selection {
+            background: var(--primary);
+            color: white;
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--primary-dark), var(--secondary));
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🛒</div>
+            <h1><span>Sistema de Compras</span> API v2.1.0</h1>
+            <p>🚀 Professional REST API | Production-Ready Architecture</p>
+            
+            <div class="version-info">
+                <span class="badge badge-success">✓ API v2 Active</span>
+                <span class="badge badge-info">🔐 JWT Secured</span>
+                <span class="badge badge-warning">⚡ Redis Cached</span>
+                <span class="badge badge-primary">🐳 Docker Ready</span>
+            </div>
+        </header>
+
+        <div class="highlight-banner">
+            <div>
+                <strong>🎯 Accesos Rápidos:</strong> Documentación interactiva, panel administrativo, analytics y gestión de cache
+            </div>
+            <div class="cta-buttons">
+                <a class="btn" href="{% url 'swagger-ui' %}" target="_blank">📖 Swagger UI</a>
+                <a class="btn secondary" href="{% url 'redoc' %}" target="_blank">📋 ReDoc</a>
+                <a class="btn warning" href="{% url 'admin:index' %}" target="_blank">⚙️ Admin Panel</a>
+                <a class="btn ghost" href="https://github.com/guille-nat/Api_Compras" target="_blank">🐙 GitHub</a>
+                <a class="btn ghost" href="https://nataliullacoder.com/" target="_blank">🛠️ Web Creador</a>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <section class="system-overview">
+                <h2>📋 Descripción del Sistema</h2>
+                <p>
+                    Sistema empresarial de gestión de compras de <strong>alta performance</strong> que incluye manejo de inventario multi-ubicación, 
+                    gestión de pagos en cuotas con reglas de negocio avanzadas, sistema de promociones flexible, notificaciones automáticas 
+                    vía email y cache Redis para optimización de rendimiento. Desarrollado con <strong>Django REST Framework</strong> siguiendo 
+                    las mejores prácticas de arquitectura de APIs, incluyendo testing exhaustivo con <strong>Pytest</strong>, procesamiento 
+                    asíncrono con <strong>Celery</strong> y monitoreo de performance en tiempo real.
+                </p>
+            </section>
+
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <div class="tech-icon">🐍</div>
+                    <div class="tech-name">Python</div>
+                    <div class="tech-version">3.10+</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🎯</div>
+                    <div class="tech-name">Django</div>
+                    <div class="tech-version">5.1.5</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🔥</div>
+                    <div class="tech-name">DRF</div>
+                    <div class="tech-version">3.15.2</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🐬</div>
+                    <div class="tech-name">MySQL</div>
+                    <div class="tech-version">9.0</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">⚡</div>
+                    <div class="tech-name">Redis</div>
+                    <div class="tech-version">7-Alpine</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🌿</div>
+                    <div class="tech-name">Celery</div>
+                    <div class="tech-version">5.5.3</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🧪</div>
+                    <div class="tech-name">Pytest</div>
+                    <div class="tech-version">8.4.1</div>
+                </div>
+                <div class="tech-item">
+                    <div class="tech-icon">🐳</div>
+                    <div class="tech-name">Docker</div>
+                    <div class="tech-version">Compose</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">📊 Métricas del Proyecto</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">17</div>
+                    <div class="stat-label">Modelos de Datos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">60+</div>
+                    <div class="stat-label">Endpoints API</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">>55%</div>
+                    <div class="stat-label">Test Coverage</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Microservicios</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">JWT</div>
+                    <div class="stat-label">Auth System</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">Redis</div>
+                    <div class="stat-label">Cache Layer</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">✨ Características Principales</h2>
+            <section class="features-grid">
+                <div class="feature-card">
+                    <h3>🐳 Arquitectura Containerizada</h3>
+                    <p>Sistema completo con Docker Compose orquestando múltiples servicios en producción.</p>
+                    <ul>
+                        <li>Backend Django con Gunicorn</li>
+                        <li>MySQL 9.0 con persistencia</li>
+                        <li>Redis 7 para cache y broker</li>
+                        <li>Celery Worker para tareas async</li>
+                        <li>Celery Beat para cron jobs</li>
+                        <li>Health checks automáticos</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>⚡ Sistema de Cache Redis</h3>
+                    <p>Cache inteligente con Redis 7-Alpine para máxima performance.</p>
+                    <ul>
+                        <li>Cache de queries frecuentes</li>
+                        <li>Invalidación automática por patrones</li>
+                        <li>Fallback a memoria local</li>
+                        <li>API de administración de cache</li>
+                        <li>Monitoreo en tiempo real</li>
+                        <li>Mejoras de hasta 95% en latencia</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🧪 Testing Exhaustivo</h3>
+                    <p>Suite completa de tests automatizados con Pytest y cobertura >55%.</p>
+                    <ul>
+                        <li>Tests unitarios y de integración</li>
+                        <li>Factory Boy para fixtures</li>
+                        <li>Ejecución paralela (pytest-xdist)</li>
+                        <li>Coverage reports detallados</li>
+                        <li>CI/CD integration ready</li>
+                        <li>Mocking de servicios externos</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🌿 Procesamiento Asíncrono</h3>
+                    <p>Celery + Redis para tareas en background sin bloquear requests.</p>
+                    <ul>
+                        <li>Envío de emails asíncrono</li>
+                        <li>Generación de reportes complejos</li>
+                        <li>Cron jobs con Celery Beat</li>
+                        <li>Reintentos automáticos</li>
+                        <li>Monitoreo de tareas</li>
+                        <li>Rate limiting inteligente</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🔐 Autenticación JWT</h3>
+                    <p>Sistema de autenticación stateless con JSON Web Tokens.</p>
+                    <ul>
+                        <li>Access & Refresh tokens</li>
+                        <li>Rotación automática de tokens</li>
+                        <li>Blacklist de tokens revocados</li>
+                        <li>Permisos granulares por rol</li>
+                        <li>Rate limiting por usuario</li>
+                        <li>Registro y login seguros</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🛍️ Gestión de Productos</h3>
+                    <p>CRUD completo de productos con categorías jerárquicas.</p>
+                    <ul>
+                        <li>Categorías multinivel</li>
+                        <li>Búsqueda y filtrado avanzado</li>
+                        <li>Imágenes de productos</li>
+                        <li>Validaciones de negocio</li>
+                        <li>Cache agresivo (1h TTL)</li>
+                        <li>Historial de cambios</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📦 Control de Inventario</h3>
+                    <p>Gestión de stock multi-ubicación con trazabilidad completa.</p>
+                    <ul>
+                        <li>Stock por ubicación física</li>
+                        <li>Movimientos IN/OUT/TRANSFER</li>
+                        <li>Alertas de stock bajo</li>
+                        <li>Snapshots históricos</li>
+                        <li>Auditoría de movimientos</li>
+                        <li>Reportes de rotación</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>💰 Sistema de Pagos</h3>
+                    <p>Gestión avanzada de pagos en cuotas con reglas de negocio.</p>
+                    <ul>
+                        <li>Pagos en 1 a 12 cuotas</li>
+                        <li>Múltiples métodos de pago</li>
+                        <li>Cálculo automático de intereses</li>
+                        <li>Recargos por mora automáticos</li>
+                        <li>Notificaciones de vencimiento</li>
+                        <li>Historial de transacciones</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📊 Analytics & Reportes</h3>
+                    <p>Business Intelligence con reportes en Excel y gráficos.</p>
+                    <ul>
+                        <li>6 tipos de reportes automáticos</li>
+                        <li>Gráficos con Matplotlib</li>
+                        <li>Exportación a Excel (OpenPyXL)</li>
+                        <li>Análisis con Pandas & NumPy</li>
+                        <li>Reportes multiidioma (ES/EN)</li>
+                        <li>Generación asíncrona</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🔔 Sistema de Notificaciones</h3>
+                    <p>Notificaciones automáticas vía email con templates HTML.</p>
+                    <ul>
+                        <li>Templates personalizables</li>
+                        <li>Envío asíncrono con Celery</li>
+                        <li>Log de notificaciones</li>
+                        <li>Reintentos automáticos</li>
+                        <li>Métricas de entrega</li>
+                        <li>Multi-idioma</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🎁 Sistema de Promociones</h3>
+                    <p>Motor flexible de promociones y descuentos.</p>
+                    <ul>
+                        <li>Descuentos porcentuales y fijos</li>
+                        <li>Promociones por categoría</li>
+                        <li>Vigencia configurable</li>
+                        <li>Stacking de promociones</li>
+                        <li>Validaciones automáticas</li>
+                        <li>Reportes de efectividad</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📚 Documentación Interactiva</h3>
+                    <p>Documentación completa con Swagger UI y ReDoc.</p>
+                    <ul>
+                        <li>Swagger UI interactivo</li>
+                        <li>ReDoc elegante</li>
+                        <li>OpenAPI 3.0 Schema</li>
+                        <li>Try-it-out en vivo</li>
+                        <li>Ejemplos de requests</li>
+                        <li>Modelos documentados</li>
+                    </ul>
+                </div>
+            </section>
+
+            <h2 class="section-title">🔧 Highlights Técnicos</h2>
+            <section class="features-grid">
+                <div class="feature-card">
+                    <h3>🏗️ Arquitectura Modular</h3>
+                    <p>Diseño escalable con separación de responsabilidades.</p>
+                    <ul>
+                        <li>Apps Django independientes</li>
+                        <li>Services layer para lógica de negocio</li>
+                        <li>Serializers con mixins reutilizables</li>
+                        <li>ViewSets con permisos granulares</li>
+                        <li>Signals para eventos del sistema</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🛡️ Seguridad</h3>
+                    <p>Implementación de mejores prácticas de seguridad.</p>
+                    <ul>
+                        <li>Autenticación JWT stateless</li>
+                        <li>Passwords hasheados (bcrypt)</li>
+                        <li>Validación de inputs</li>
+                        <li>CORS configurado</li>
+                        <li>Rate limiting</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📈 Performance</h3>
+                    <p>Optimizaciones para máxima velocidad.</p>
+                    <ul>
+                        <li>Cache Redis en queries frecuentes</li>
+                        <li>Select/prefetch related</li>
+                        <li>Paginación eficiente</li>
+                        <li>Índices de base de datos</li>
+                        <li>Queries optimizadas</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🔍 Monitoreo</h3>
+                    <p>Observabilidad y debugging avanzado.</p>
+                    <ul>
+                        <li>Logging estructurado</li>
+                        <li>Error tracking</li>
+                        <li>Performance metrics</li>
+                        <li>Cache hit/miss stats</li>
+                        <li>Query analysis</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="footer">
+            <p>🚀 <strong>Sistema de Compras API v2.1.0</strong> | Desarrollado con Django REST Framework</p>
+            <p>
+                <a href="https://github.com/guille-nat" target="_blank">👨‍💻 Guillermo Natali Ulla</a> | 
+                <a href="mailto:guillermonatali22@gmail.com">📧 guillermonatali22@gmail.com</a>
+            </p>
+            <p style="margin-top: 1rem; opacity: 0.8;">
+                © 2025 | Licensed under MIT | Production Ready 🎯
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

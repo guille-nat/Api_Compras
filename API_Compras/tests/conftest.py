@@ -1,36 +1,127 @@
+"""
+Configuración global de fixtures para los tests del proyecto SistemaCompra.
+
+Este módulo contiene fixtures que pueden ser utilizadas por todos los tests
+del proyecto, incluyendo usuarios de prueba y configuraciones comunes.
+"""
 import os
-import django
 import pytest
-from dotenv import load_dotenv
+from django import setup
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from decimal import Decimal
+from datetime import date, timedelta
 
-load_dotenv()
+# Configurar entorno para tests
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SistemaCompras.test_settings')
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "SistemaCompras.settings")
-django.setup()
+# Configurar Django si no está configurado
+if not settings.configured:
+    setup()
+
+User = get_user_model()
 
 
-@pytest.fixture(autouse=True, scope="session")
-def _db_sqlite_en_tests(settings):
+@pytest.fixture
+def user(db):
     """
-    Si la env var USE_SQLITE_FOR_TESTS=1, forzamos SQLite en memoria para tests.
+    Fixture que crea un usuario de prueba básico.
+
+    Returns:
+        CustomUser: Usuario de prueba con datos estándar.
     """
-    if os.getenv("USE_SQLITE_FOR_TESTS") == "1":
-        settings.DATABASES["default"] = {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": ":memory:",
-        }
+    return User.objects.create_user(
+        username="testuser",
+        email="test@example.com",
+        password="testpass123"
+    )
 
 
-@pytest.fixture(autouse=True)
-def _settings_defaults(settings):
+@pytest.fixture
+def admin_user(db):
     """
-    Ajustes útiles solo para tests (no tocan prod):
-    - Forzamos DEBUG True para facilitar mensajes
-    - Bajamos throttle rates para que los tests sean rápidos
+    Fixture que crea un usuario administrador de prueba.
+
+    Returns:
+        CustomUser: Usuario administrador para tests que requieren permisos especiales.
     """
-    settings.DEBUG = True
-    settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
-        "user": "1000/minute",
-        "anon": "1000/minute",
-    }
-    return settings
+    return User.objects.create_superuser(
+        username="admin",
+        email="admin@example.com",
+        password="adminpass123"
+    )
+
+
+@pytest.fixture
+def multiple_users(db):
+    """
+    Fixture que crea múltiples usuarios de prueba.
+
+    Returns:
+        list[CustomUser]: Lista de usuarios para tests que requieren múltiples usuarios.
+    """
+    users = []
+    for i in range(3):
+        user = User.objects.create_user(
+            username=f"user{i}",
+            email=f"user{i}@example.com",
+            password=f"userpass{i}123"
+        )
+        users.append(user)
+    return users
+
+
+@pytest.fixture
+def current_date():
+    """
+    Fixture que proporciona la fecha actual.
+
+    Returns:
+        date: Fecha actual para tests que necesitan fechas consistentes.
+    """
+    return date.today()
+
+
+@pytest.fixture
+def future_date():
+    """
+    Fixture que proporciona una fecha futura (30 días).
+
+    Returns:
+        date: Fecha futura para tests de vencimientos, etc.
+    """
+    return date.today() + timedelta(days=30)
+
+
+@pytest.fixture
+def past_date():
+    """
+    Fixture que proporciona una fecha pasada (30 días atrás).
+
+    Returns:
+        date: Fecha pasada para tests de vencimientos, auditoría, etc.
+    """
+    return date.today() - timedelta(days=30)
+
+
+@pytest.fixture
+def current_datetime():
+    """
+    Fixture que proporciona la fecha y hora actual.
+
+    Returns:
+        datetime: Datetime actual para tests que necesitan timestamps consistentes.
+    """
+    return timezone.now()
+
+
+@pytest.fixture
+def sample_decimal():
+    """
+    Fixture que proporciona un valor decimal de ejemplo.
+
+    Returns:
+        Decimal: Valor decimal para tests financieros.
+    """
+    return Decimal('1500.75')

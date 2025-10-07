@@ -1,5 +1,4 @@
 from django.db import models
-from api.users.models import CustomUser
 from api.products.models import Product
 from django.conf import settings
 from decimal import Decimal
@@ -11,13 +10,14 @@ class Purchase(models.Model):
 
     Atributos:
         user (ForeignKey): Referencia al usuario que realizó la compra.
-        purchase_date (DateField): Fecha en que se realizó la compra.
+        purchase_date (DateTimeField): Fecha en que se realizó la compra.
         total_amount (DecimalField): Monto total de la compra.
         total_installments_count (int): Cantidad de cuotas en la que se divide la compra.
         status (CharFile): Estado de la compra [OPEN, PAID, CANCELLED].
         discount_applied (DecimalField): Descuento aplicado al pago, si corresponde.
         updated_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue modificado el registro.
         created_at (DateTimeField): Campo de auditoría almacena la fecha y hora que fue creado el registro.
+        created_by (ForeignKey): Referencia al usuario que creo el registro. 
         updated_by (ForeignKey): Referencia al usuario que actualizo el registro.
     """
     class Status(models.TextChoices):
@@ -27,7 +27,7 @@ class Purchase(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
-    purchase_date = models.DateField()
+    purchase_date = models.DateTimeField()
     total_amount = models.DecimalField(
         max_digits=12, decimal_places=2, default=Decimal('0'))
     total_installments_count = models.PositiveIntegerField(default=1)
@@ -38,6 +38,9 @@ class Purchase(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                   on_delete=models.SET_NULL, null=True, blank=True,
+                                   related_name="purchase_created")
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL,
                                    on_delete=models.SET_NULL, null=True, blank=True,
                                    related_name="purchase_updated")
