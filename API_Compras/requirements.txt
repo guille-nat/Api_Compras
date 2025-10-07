@@ -1,0 +1,56 @@
+# Django Core
+Django==5.1.5
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.4.0
+
+# Database
+mysqlclient==2.2.7
+
+# Cache
+django-redis==6.0.0
+redis==6.4.0
+
+# API Documentation
+drf-spectacular==0.26.5
+drf-spectacular-sidecar==2025.9.1
+drf-yasg==1.21.8
+
+# CORS Support
+django-cors-headers==4.6.0
+
+# Filtering
+django-filter==24.2
+
+# Asynchronous Task Queue
+celery==5.5.3
+django_celery_results==2.6.0
+django-celery-beat==2.8.1
+flower==2.0.1
+
+# Data Science & Analytics
+pandas==2.3.2
+numpy==2.2.6
+matplotlib==3.10.6
+openpyxl==3.1.5
+
+# Configuration & Environment
+python-dotenv==1.0.1
+
+# Django Extensions
+django-extensions==3.2.3
+
+# Date Utilities
+python-dateutil==2.9.0.post0
+
+# Testing
+pytest==8.4.1
+pytest-django==4.11.1
+pytest-cov==6.2.1
+factory-boy==3.3.3
+Faker==37.8.0
+
+# Image Processing (for potential future use)
+Pillow==11.3.0
+
+# Timezone Support
+pytz==2024.2

@@ -1,0 +1,121 @@
+name: SistemaCompras
+services:
+  db:
+    container_name: db_api_compras
+    image: mysql:9.0
+    env_file:
+      - ./API_Compras/.env
+    volumes:
+      - db_api_compras:/var/lib/mysql
+    expose:
+      - "3306"        
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api_compras_network
+    restart: always
+
+  backend:
+    container_name: backend_api_compras
+    build:
+      context: ./API_Compras
+      dockerfile: Dockerfile
+    env_file:
+      - ./API_Compras/.env
+    volumes:
+      - ./API_Compras:/app
+      - static_volume_backend:/app/static
+      - media_volume_backend:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    networks:
+      - api_compras_network
+    restart: always
+
+  redis:
+    container_name: redis_cache
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    
+    env_file:
+      - ./API_Compras/.env
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    command: 
+      - redis-server
+      - /usr/local/etc/redis/redis.conf
+      - --requirepass
+      - S2yU-un9jDA-IU-8tpKEg-b-EGej5cUI8-8Jju-k-U9-3MU-b-zzUUg-Redis2025
+    networks:
+      - api_compras_network
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "[password_redis]", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512m 
+          cpus: '0.5'
+
+  celery_worker:
+    container_name: celery_worker_api_compras
+    build:
+      context: ./API_Compras
+      dockerfile: Dockerfile
+    env_file:
+      - ./API_Compras/.env
+    volumes:
+      - ./API_Compras:/app
+      - static_volume_backend:/app/static
+      - media_volume_backend:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A SistemaCompras worker --loglevel=info --concurrency=4
+    networks:
+      - api_compras_network
+    restart: always
+
+  celery_beat:
+    container_name: celery_beat_api_compras
+    build:
+      context: ./API_Compras
+      dockerfile: Dockerfile
+    env_file:
+      - ./API_Compras/.env
+    volumes:
+      - ./API_Compras:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A SistemaCompras beat --loglevel=info
+    networks:
+      - api_compras_network
+    restart: always
+
+volumes:
+  db_api_compras:
+  static_volume_backend:
+  media_volume_backend:
+  redis_data:
+
+networks:
+  api_compras_network:
+    driver: bridge

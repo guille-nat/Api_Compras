@@ -1,10 +1,106 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.tox/
+*.cover
+*.coverage
+*.coverage.*
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+
+# Sensitive/local files
+*.env
+env.*
+
+# Node
+node_modules/
 plantilla.html
 plantilla2.html
-.env
 MER.mwb
 MER.mwb.bak
 *.env
+.vscode/
+*.venv
 __pycache__/
 *.pyc
-build/
-.vscode/
+*.pyo
+*.pyd
+*.sqlite3
+.env
+.env.*
+.build/
+dist/
+node_modules/
+static/
+media/
+.git
+.env
+.pytest_cache
+.coverage
+coverage.xml
+.github/
+htmlcov
+staticfiles/
+
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md

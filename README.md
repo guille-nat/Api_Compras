@@ -1,228 +1,400 @@
-# **💸API_COMPRAS**
+# 🛒 Sistema de Compras - API REST
 
-API diseñada para la gestión de compras, pagos, cuotas, inventario y usuarios. Este proyecto incluye validaciones robustas y reglas de negocio para asegurar un manejo eficiente y seguro de las operaciones.
+> **Sistema completo de gestión de compras, pagos en cuotas, inventario y analíticas empresariales con arquitectura moderna y alto rendimiento.**
 
-## **🌟Características Principales**
-
-- Gestión de productos e inventario.
-- Registro de compras con detalles asociados.
-- Manejo de cuotas y pagos con descuentos y recargos.
-- Notificaciones automáticas para usuarios sobre el estado de sus compras y pagos.
-
----
-
-## ✅ **Resumen de Mejoras Aplicadas**
-
-1. Cambio a versión 1.0.1.
-2. URIs en inglés y en plural.  
-3. Eliminación de la barra final en rutas.
-4. Migraciones centralizadas en el root.
-5. Documentación clara sobre JWT y Bearer Token.
-6. Cambio el nombre de las variables y modelos a inglés.
-7. Configuración para que todos los datos String(str) se guarden en minúsculas, excepto los campos claves como "product_code" y "payment_method".
-8. Cambio del modelo de usuario a CustomUser donde se modificó e método sve para asegurar que los campos "first_name, last_name, email y username" se guarden en minúsculas.
-9. Optimización de la función "get_queryset" de api/user/views.py .
+[![Django](https://img.shields.io/badge/Django-5.1.5-green.svg)](https://www.djangoproject.com/)
+[![DRF](https://img.shields.io/badge/DRF-3.15.2-red.svg)](https://www.django-rest-framework.org/)
+[![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+[![Redis](https://img.shields.io/badge/Redis-Cache-DC382D.svg)](https://redis.io/)
+[![MySQL](https://img.shields.io/badge/MySQL-9.0-4479A1.svg)](https://www.mysql.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-## 🔧 **Últimos Archivos Modificados**
+## 🌟 Características Principales
 
-1. Cambio de nombre en apps > api.compras => api.purchases | api.pagos => api.payments | api.productos => api.users <.
-2. Cambio nombre de las clases modelos y sus atributos.
-3. Eliminación de las carpetas individuales de Migrations para unirlas todas en una sola en el root.
-4. En api.utils.py se cambio el nombre de la función y los parámetros de "enviar_correo(email_destino, asunto, mensaje_html)" pasar a ser "sendEmail(destination_email, subject, message_html)".
+### 🚀 **Alto Rendimiento**
 
----
 
-## ⏳ **Resumen de Mejoras Futuras**
+- **Cache Redis** con invalidación inteligente y métricas en tiempo real
+- **Optimización de consultas** con `select_related` y `prefetch_related`
+- **Paginación eficiente** para grandes volúmenes de datos
+- **Arquitectura escalable** lista para microservicios
 
-1. Implementación de protección específica contra DDoS.  
 
----
+### 📊 **Business Intelligence**
 
-## **🔒Autenticación con JWT**
+- **Reportes asíncronos** con Celery para procesamiento en segundo plano
+- **Gráficos profesionales** con Matplotlib integrados en Excel
+- **Analíticas avanzadas**: rotación de productos, ventas, mora, inventario
+- **Multi-formato**: Excel, PNG, ZIP, JSON
 
-El proyecto utiliza **JSON Web Tokens (JWT)** bajo el esquema **Bearer** para la autenticación. Esto asegura que solo usuarios autenticados puedan acceder a las rutas protegidas de la API.
 
-### **Obtener un Token de Acceso**
+### 🔐 **Seguridad Empresarial**
 
-Para obtener un token de acceso, realiza una petición `POST` al endpoint `/api/token/` con las credenciales del usuario:
+- **Autenticación JWT** con tokens de acceso y refresco
+- **Permisos granulares** por rol (Admin/Staff/User)
+- **Validación robusta** de datos en todas las capas
 
-```json
-{
-  "username": "tu_usuario",
-  "password": "tu_contraseña"
-}
-```
+- **Auditoría completa** de operaciones críticas
 
-### **Uso del Token**
+### 🧪 **Calidad de Código**
 
-Incluye el token en el encabezado de las peticiones protegidas:
+- **+300 tests automatizados** con pytest (coverage >85%)
+- **Documentación OpenAPI 3.0** con Swagger UI y ReDoc
 
-```
-   Authorization: Bearer <tu_token>
-```
+- **Clean Code** siguiendo principios SOLID
+- **Type hints** y validación estricta
 
-## **💼Reglas de Negocio**
+### 🐳 **DevOps Ready**
 
-### **📝Productos e Inventario**
-
-1. **Stock Disponible**:
-   - Antes de procesar una compra, se valida que el stock del producto sea suficiente.
-   - Si el stock no es suficiente, se rechaza la compra con un mensaje detallado.
-
-2. **Actualización de Stock**:
-   - Al procesar una compra, el stock del producto se reduce según la cantidad adquirida.
+- **Docker Compose** con hot-reload para desarrollo
+- **CI/CD friendly** con variables de entorno
+- **Logs estructurados** para monitoreo
+- **Healthchecks** en todos los servicios
 
 ---
 
-### **🛒Compras**
+## 📋 Tabla de Contenidos
 
-1. **Detalles de Compra**:
-   - Cada compra puede incluir uno o más productos.
-   - Es obligatorio especificar los productos y la cantidad comprada.
-
-2. **Validación de Cuotas**:
-   - El número de cuotas debe ser mayor a 0.
-   - Si el número de cuotas supera las 6, cada cuota tendrá un incremento del **15%** en su monto.
-
-3. **Descuento Aplicado**:
-   - Es posible aplicar un descuento general al monto total de la compra mediante el campo `descuento_aplicado`.
-
-4. **Fecha de Vencimiento**:
-   - La fecha de vencimiento total de la compra se calcula automáticamente con base en la fecha de compra y el número de cuotas (cada cuota tiene un plazo de 30 días).
+- [Inicio Rápido](#-inicio-rápido)
+- [Stack Tecnológico](#-stack-tecnológico)
+- [Arquitectura](#️-arquitectura)
+- [Documentación](#-documentación)
+- [Desarrollo](#-desarrollo)
+- [Testing](#-testing)
+- [Contribuir](#-contribuir)
+- [Licencia](#-licencia)
 
 ---
 
-### **💰Pagos y Cuotas**
+## 🚀 Inicio Rápido
 
-1. **Descuento por Pronto Pago**:
-   - Si una cuota es pagada antes de su fecha de vencimiento, se aplica un descuento adicional del **5%** al monto de la cuota.
+### Prerequisitos
 
-2. **Recargo por Pago Tardío**:
-   - Si una cuota no se paga dentro del plazo de 30 días desde su emisión, se aplica un recargo del **8%** sobre el monto de la cuota.
+- Docker & Docker Compose
+- Git
+- 4GB RAM mínimo
 
-3. **Cálculo de Montos en Cuotas**:
-   - En compras con más de 6 cuotas, se aplica un incremento del **15%** en el monto de cada cuota.
-
----
-
-## **📄Documentación de los Endpoints**
-
-La documentación de los endpoints está disponible en los siguientes enlaces:
-
-- **Swagger:** [http://localhost:8000/doc](http://localhost:8000/doc)
-- **Redoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
-
-Ambos proporcionan una descripción completa de los endpoints disponibles, métodos permitidos, parámetros requeridos y ejemplos de respuestas.
-
----
-
-## **📧 Envío de Correos Electrónicos**
-
-El proyecto incluye una funcionalidad para el envío de correos electrónicos a los usuarios, utilizando la configuración de correo de Django. Los correos pueden incluir contenido en formato HTML para proporcionar una presentación visual más profesional.
-
-## **🚀 Configuración del Servicio de Correo**
-
-Para que el sistema de envío de correos funcione correctamente, es necesario configurar las variables de entorno relacionadas con el servidor SMTP en el archivo .env. A continuación, se presenta un ejemplo de configuración:
+### Instalación con Docker (Recomendado)
 
 ```bash
-   EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-   EMAIL_HOST=smtp.tu-servidor.com
-   EMAIL_PORT=587
-   EMAIL_USE_TLS=True
-   EMAIL_HOST_USER=tu-correo@dominio.com
-   EMAIL_HOST_PASSWORD=tu-contraseña
-   DEFAULT_FROM_EMAIL="Tu Proyecto <tu-correo@dominio.com>"
+# 1. Clonar repositorio
+git clone https://github.com/guille-nat/Api_Compras.git
+cd Api_Compras
+
+# 2. Configurar variables de entorno
+cp API_Compras/.env.example API_Compras/.env
+# Editar .env con tus configuraciones
+
+# 3. Levantar servicios
+docker-compose up -d --build
+
+# 4. Verificar servicios
+docker ps
+
+# 5. Acceder a la aplicación
+# API: http://localhost:8000/api/v2/
+# Admin: http://localhost:8000/admin/
+# Swagger: http://localhost:8000/api/v2/schema/swagger-ui/
+# ReDoc: http://localhost:8000/api/v2/schema/redoc/
 ```
 
----
-
-## **Estructura:**
+### Primeros Pasos
 
 ```bash
-   api/
-   ├── management/
-   │   ├── __init__.py          # Archivo vacío
-   │   ├── commands/
-   │   │   ├── __init__.py      # Archivo vacío
-   │   │   ├── actualizar_cuotas.py  # Archivo del comando
+# Generar datos de prueba
+docker-compose exec backend python manage.py generate_data
+
+# Crear superusuario
+docker-compose exec backend python manage.py createsuperuser
+
+# Ver logs
+docker-compose logs -f backend
 ```
 
-## *🔧 Estructura del Código*
+**📖 Guía completa**: Ver [Documentación de Instalación](doc/INSTALLATION.md)
 
-Utilidad para el Envío de Correos (utils.py)
-El módulo utils.py incluye la función enviar_correo, encargada de gestionar el envío de correos electrónicos.
 
 ---
 
-## Comando de Prueba para Enviar Correos (prueba_email.py)
+## 🛠️ Stack Tecnológico
 
-Se ha creado un comando de Django para probar el envío de correos electrónicos con contenido HTML
+### Backend
 
-## **🛠 Cómo Ejecutar la Prueba**
 
-Para probar el envío de correos electrónicos, ejecuta el siguiente comando en tu terminal:
+- **Django 5.1.5** - Framework web robusto y escalable
+- **Django REST Framework 3.15.2** - API REST con todas las funcionalidades
+- **Celery 5.5.3** - Procesamiento asíncrono de tareas
+- **Redis 7** - Cache de alta velocidad y message broker
+
+
+### Base de Datos
+
+- **MySQL 9.0** - Base de datos relacional principal
+- **django-redis 6.0.0** - Backend de cache optimizado
+
+
+### Analíticas
+
+- **Pandas 2.3.2** - Procesamiento de datos
+- **NumPy 2.2.6** - Cálculos numéricos
+
+- **Matplotlib 3.10.6** - Visualización de datos
+- **OpenPyXL 3.1.5** - Generación de Excel
+
+### Documentación
+
+- **drf-spectacular 0.26.5** - OpenAPI 3.0 schema
+- **drf-yasg 1.21.8** - Swagger UI mejorado
+
+### Testing
+
+- **Pytest 8.4.1** - Framework de testing moderno
+- **Factory Boy 3.3.3** - Generación de datos de prueba
+- **Coverage 6.2.1** - Análisis de cobertura
+
+**📦 Dependencias completas**: Ver [requirements.txt](API_Compras/requirements.txt)
+
+---
+
+## 🏗️ Arquitectura
+
+### Estructura del Proyecto
+
+```
+SistemaCompra/
+├── API_Compras/          # Aplicación Django principal
+│   ├── api/              # Apps modulares
+│   │   ├── analytics/    # 📊 Reportes y BI
+│   │   ├── cache/        # 🚀 Sistema de cache
+│   │   ├── categories/   # 📂 Categorías
+│   │   ├── inventories/  # 📦 Inventario
+│   │   ├── payments/     # 💳 Pagos y cuotas
+│   │   ├── products/     # 🛍️ Productos
+│   │   ├── promotions/   # 🎁 Promociones
+│   │   ├── purchases/    # 🛒 Compras
+│   │   ├── storage_location/  # 🏢 Ubicaciones
+│   │   └── users/        # 👥 Usuarios
+
+│   ├── SistemaCompras/   # Configuración Django
+│   └── manage.py
+├── doc/                  # 📚 Documentación técnica
+├── redis/                # ⚙️ Configuración Redis
+└── docker-compose.yml    # 🐳 Orquestación
+```
+
+### Módulos Principales
+
+
+#### 📊 Analytics (Reportes Asíncronos)
+
+- Rotación de productos por ubicación
+- Movimientos de inventario (entrada/salida)
+- Resumen de ventas con gráficos
+
+- Productos más vendidos (Top N)
+- Análisis de métodos de pago
+- Reporte de cuotas vencidas con mora
+
+#### 🚀 Cache System
+
+
+- Invalidación inteligente por patrones
+- Métricas de rendimiento en tiempo real
+- Dashboard administrativo
+- Precalentamiento automático
+
+#### 💳 Payments (Sistema de Cuotas)
+
+- Cálculo automático de cuotas
+- Gestión de mora y recargos
+- Pagos parciales y totales
+- Auditoría completa de cambios
+
+#### 🛍️ Products & Inventory
+
+- Control de stock por ubicación
+- Movimientos con trazabilidad
+- Snapshots históricos
+- Alertas de stock bajo
+
+**🏗️ Diagrama completo**: Ver [Arquitectura Detallada](doc/ARCHITECTURE.md)
+
+---
+
+## 📚 Documentación
+
+### Guías Principales
+
+| Documento | Descripción |
+|-----------|-----<http://localhost:8000/api/v2/schema/swagger-ui/>
+| [📥 Instala<http://localhost:8000/api/v2/schema/redoc/> de instalación local y Docker |
+| [🏗️ Arquitectura](d<http://localhost:8000/api/v2/schema/>tema y decisiones técnicas |
+| [🚀 Cache Redis](doc/CACHE.md) | Sistema de cache y optimización |
+| [📊 Analytics](doc/ANALYTICS.md) | Reportes asíncronos con Celery |
+| [🔐 Autenticación](doc/AUTHENTICATION.md) | JWT, permisos y seguridad |
+| [🐳 Docker](doc/DOCKER.md) | Configuración y troubleshooting |
+| [⚙️ Variables de Entorno](doc/ENVIRONMENT.md) | Configuración completa |
+| [🔧 API Standards](doc/API_STANDARDS.md) | Estándares de respuestas |
+| [🔕 Signals Control](doc/SIGNALS.md) | Control de notificaciones |
+| [🧪 Testing](doc/TESTING.md) | Guía de testing y cobertura |
+
+### API Interactiva
+
+- **Swagger UI**: <http://localhost:8000/api/v2/schema/swagger-ui/>
+- **ReDoc**: <http://localhost:8000/api/v2/schema/redoc/>
+- **OpenAPI Schema**: <http://localhost:8000/api/v2/schema/>
+
+---
+
+## 💻 Desarrollo
+
+### Setup Local
 
 ```bash
-   python manage.py prueba_email
+# Crear entorno virtual
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# .venv\Scripts\activate    # Windows
+
+# Instalar dependencias
+cd API_Compras
+pip install -r requirements.txt
+
+# Configurar base de datos
+cp .env.example .env
+# Editar .env con tus configuraciones
+
+# Aplicar migraciones
+python manage.py migrate
+
+# Crear superusuario
+python manage.py createsuperuser
+
+# Iniciar servidor de desarrollo
+python manage.py runserver
 ```
 
-Si la configuración es correcta, deberías recibir un correo con el contenido en formato HTML.
-
----
-
-### **Automatización**
-
-Este comando se puede automatizar utilizando un cron job (Linux) o el programador de tareas de Windows para ejecutarlo a intervalos regulares, garantizando que las cuotas y notificaciones se actualicen automáticamente sin intervención manual.
-
-Ejemplo de configuración en crontab (Linux):
+### Comandos Útiles
 
 ```bash
-0 0 * * * /ruta/a/tu/python /ruta/a/tu/proyecto/manage.py actualizar_cuotas
+# Generar datos de prueba
+python manage.py generate_data --products 500 --users 100
+
+# Ver estadísticas de cache
+python manage.py cache_admin stats
+
+# Limpiar cache
+python manage.py cache_admin clear
+
+# Ejecutar tests
+pytest
+
+# Cobertura de tests
+pytest --cov=api --cov-report=html
+
+# Django shell mejorado
+python manage.py shell_plus --ipython
+
+# Ver tareas de Celery
+celery -A SistemaCompras inspect active
 ```
 
-## **Instalación y Configuración**
-
-1. Clonar este repositorio:
-
-   ```bash
-     git clone <URL_DEL_REPOSITORIO>
-     cd API_COMPRAS
-   ```
-
-2. Crear y activar un entorno virtual:
-
-   ```bash
-    python -m venv .venv
-    source .venv/bin/activate  # En Windows: .venv\Scripts\activate
-   ```
-
-3. Instalar las dependencias:
-
-   ```bash
-     pip install -r requirements.txt
-   ```
-
-4. Realizar las migraciones:
-
-     ```bash
-     python manage.py makemigrations
-     python manage.py migrate
-     ```
-
-5. Ejecutar el servidor de desarrollo:
-
-     ```bash
-     python manage.py runserver
-     ```
+**🔧 Más comandos**: Ver [Guía de Desarrollo](doc/DEVELOPMENT.md)
 
 ---
 
-## **💪🏼Creado Por...**
+## 🧪 Testing
 
-Natali Ulla Guillermo Enrique.
+### Ejecutar Tests
 
-- [Github](https://github.com/guille-nat)
-- [Portfolio](https://nataliullacoder.com/)
-- Correo: <guillermonatali22@gmail.com>
+```bash
+# Todos los tests
+pytest
+
+# Tests específicos
+pytest api/analytics/tests/
+pytest api/payments/tests/test_installments.py
+
+# Con cobertura
+pytest --cov=api --cov-report=html
+# Ver reporte: htmlcov/index.html
+
+# Verbose con logs
+pytest -vv -s
+```
+
+### Cobertura
+
+```bash
+# Reporte en terminal
+pytest --cov=api
+
+# Reporte HTML detallado
+pytest --cov=api --cov-report=html
+
+# Reporte XML (para CI/CD)
+pytest --cov=api --cov-report=xml
+```
+
+**Objetivo**: Mantener cobertura >85%
+
+**🧪 Guía completa**: Ver [Testing Guide](doc/TESTING.md)
+
+---
+
+## 🤝 Contribuir
+
+¡Las contribuciones son bienvenidas! Por favor lee la [Guía de Contribución](CONTRIBUTING.md) antes de enviar un Pull Request.
+
+### Proceso
+
+1. Fork del proyecto
+2. Crear rama feature (`git checkout -b feature/AmazingFeature`)
+3. Commit cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir Pull Request
+
+### Estándares de Código
+
+- Seguir PEP 8
+- Escribir docstrings en español
+- Agregar tests para nuevas funcionalidades
+- Mantener cobertura >85%
+- Usar type hints cuando sea posible
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver archivo [LICENSE](LICENSE) para más detalles.
+
+---
+
+## 👥 Autores
+
+- **Guillermo Natali** - *Desarrollo principal* - [@guille-nat](https://github.com/guille-nat)
+
+---<gutierrezfalopaalberto@gmail.com>
+
+## 🙏 Agradecimientos
+
+- Django y Django REST Framework communities
+- Contribuidores de librerías open source
+- Todos los que han aportado feedback y sugerencias
+
+---
+
+## 📞 Soporte
+
+- **Issues**: [GitHub Issues](https://github.com/guille-nat/Api_Compras/issues)
+- **Documentación**: [Wiki del Proyecto](https://github.com/guille-nat/Api_Compras/wiki)
+- **Email**: <gutierrezfalopaalberto@gmail.com>
+
+---
+
+<p align="center">
+  Hecho con ❤️ usando Django y DRF
+</p>
